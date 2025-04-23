@@ -1,6 +1,7 @@
 package db;
 
 import model.Cliente;
+import model.PacoteViagem;
 import util.ConexaoBD;
 
 import java.sql.*;
@@ -46,16 +47,67 @@ public class ClienteDAO {
         }
     }
 
-    // Método para excluir um cliente pelo CPF
-    public void deletarCliente(String cpf) {
-        String sql = "DELETE FROM clientes WHERE cpf = ?";
+    public void associarClientePacote(String identificacao, int pacoteId) {
+        // Identificação pode ser CPF ou Passaporte
+        String sql = "SELECT id FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1";
+
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
-            ps.setString(1, cpf);
-            ps.executeUpdate();
-            System.out.println("Cliente excluído com sucesso!");
+            // Verificando se o identificador é um CPF ou passaporte
+            ps.setString(1, identificacao);
+            ps.setString(2, identificacao);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int clienteId = rs.getInt("id");
+
+                // Agora associamos o cliente ao pacote
+                String associarSQL = "INSERT INTO clientes_pacotes (cliente_id, pacote_id) VALUES (?, ?)";
+                try (PreparedStatement psAssoc = conexao.prepareStatement(associarSQL)) {
+                    psAssoc.setInt(1, clienteId);
+                    psAssoc.setInt(2, pacoteId);
+                    psAssoc.executeUpdate();
+                    System.out.println("Cliente associado ao pacote com sucesso!");
+                }
+            } else {
+                System.out.println("Cliente não encontrado com o CPF ou passaporte fornecido.");
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    // Método para listar pacotes de um cliente usando CPF
+    public List<PacoteViagem> listarPacotesClientePorCpf(String cpf) {
+        List<PacoteViagem> pacotes = new ArrayList<>();
+        String sql = "SELECT p.* FROM pacotes p "
+                + "JOIN clientes_pacotes cp ON p.id = cp.pacote_id "
+                + "JOIN clientes c ON c.id = cp.cliente_id "
+                + "WHERE c.cpf = ?";
+
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                PacoteViagem pacote = new PacoteViagem(
+                        rs.getString("nome"),
+                        rs.getString("destino"),
+                        rs.getInt("duracao"),
+                        rs.getString("tipo"),
+                        rs.getFloat("preco"),
+                        rs.getString("detalhes")
+                );
+                pacote.setId(rs.getInt("id"));
+                pacotes.add(pacote);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return pacotes;
     }
 
     // Método para listar todos os clientes
@@ -81,5 +133,17 @@ public class ClienteDAO {
             e.printStackTrace();
         }
         return clientes;
+    }
+
+    // Método para excluir um cliente pelo CPF
+    public void deletarCliente(String cpf) {
+        String sql = "DELETE FROM clientes WHERE cpf = ?";
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ps.executeUpdate();
+            System.out.println("Cliente excluído com sucesso!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
