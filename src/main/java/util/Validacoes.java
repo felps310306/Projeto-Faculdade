@@ -1,4 +1,4 @@
-package ultil;
+package util;
 
 public class Validacoes {
 }
