@@ -12,4 +12,14 @@ public class ConexaoBD {
     public static Connection conectar() throws SQLException {
         return DriverManager.getConnection(URL, USUARIO, SENHA);
     }
+
+    public static boolean testarConexao() {
+        try (Connection conn = conectar()) {
+            System.out.println("✅ Conexão com o banco estabelecida com sucesso!");
+            return true;
+        } catch (SQLException e) {
+            System.out.println("❌ Erro ao conectar ao banco: " + e.getMessage());
+            return false;
+        }
+    }
 }
