@@ -19,7 +19,7 @@ public class PacoteDao {
                 stmt.setFloat(2, pacote.getPreco());
                 stmt.setInt(3, pacote.getDuracao());
                 stmt.setString(4, pacote.getTipo());
-                stmt.setString(5, pacote.getDetalhes()); // aqui o nome certo
+                stmt.setString(5, pacote.getDetalhes());
                 stmt.setString(6, pacote.getDestino());
 
                 stmt.executeUpdate();
@@ -44,9 +44,9 @@ public class PacoteDao {
                         rs.getInt("duracao"),
                         rs.getString("tipo"),
                         rs.getFloat("preco"),
-                        rs.getString("detalhes") // aqui também
+                        rs.getString("detalhes")
                 );
-                pacote.setId(rs.getInt("id")); // caso queira usar depois
+                pacote.setId(rs.getInt("id"));
                 pacotes.add(pacote);
             }
 
