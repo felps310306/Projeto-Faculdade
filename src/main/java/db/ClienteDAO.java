@@ -18,7 +18,6 @@ public class ClienteDAO {
         }
     }
 
-    // Método para inserir um novo cliente no banco de dados
     public void inserirCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes (nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
@@ -27,16 +26,33 @@ public class ClienteDAO {
             ps.setInt(3, cliente.getIdade());
             ps.setString(4, cliente.getTelefone());
             ps.setString(5, cliente.getEndereco());
-            ps.setString(6, cliente.getTipoCliente());
 
-            if (cliente.getTipoCliente().equals("estrangeiro")) {
-                ps.setString(7, cliente.getPassaporte()); // Para estrangeiros, insere o passaporte
+            String tipoCliente = cliente.getTipoCliente();
+            if (tipoCliente == null) {
+                tipoCliente = "nacional";
+            }
+            ps.setString(6, tipoCliente);
+
+            if (tipoCliente.equals("estrangeiro")) {
+                ps.setString(7, cliente.getPassaporte());
             } else {
-                ps.setNull(7, Types.VARCHAR); // Para nacionais, o passaporte é nulo
+                ps.setNull(7, Types.VARCHAR);
             }
 
             ps.executeUpdate();
             System.out.println("Cliente inserido com sucesso!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Método para excluir um cliente pelo CPF
+    public void deletarCliente(String cpf) {
+        String sql = "DELETE FROM clientes WHERE cpf = ?";
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ps.executeUpdate();
+            System.out.println("Cliente excluído com sucesso!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -58,7 +74,6 @@ public class ClienteDAO {
                 String tipoCliente = rs.getString("tipo_cliente");
                 String passaporte = rs.getString("passaporte");
 
-                // Verifica se o cliente é nacional ou estrangeiro para instanciar corretamente
                 Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente);
                 clientes.add(cliente);
             }
@@ -66,17 +81,5 @@ public class ClienteDAO {
             e.printStackTrace();
         }
         return clientes;
-    }
-
-    // Método para excluir um cliente pelo CPF
-    public void deletarCliente(String cpf) {
-        String sql = "DELETE FROM clientes WHERE cpf = ?";
-        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
-            ps.setString(1, cpf);
-            ps.executeUpdate();
-            System.out.println("Cliente excluído com sucesso!");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -1,50 +1,47 @@
 package front;
 
+import db.ClienteDAO;
+import db.PacoteDAO;
+import model.Cliente;
 import model.PacoteViagem;
-import util.ConexaoBD;
-
-import javax.swing.*;
 
 public class Main {
+
     public static void main(String[] args) {
-        // Testar conexão com o banco
-        if (!ConexaoBD.testarConexao()) {
-            JOptionPane.showMessageDialog(null, "Erro ao conectar com o banco de dados. O programa será encerrado.", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        // Criando a instância do ClienteDAO e PacoteDao
+        ClienteDAO clienteDAO = new ClienteDAO();
+        PacoteDAO pacoteDAO = new PacoteDAO();
 
-        PacoteService pacoteService = new PacoteService();
+        // Inserir Cliente
+        Cliente cliente1 = new Cliente("Maria Oliveira", "98765432100", null, 30, "999999999", "Rua ABC, 123", "nacional");
+        Cliente cliente2 = new Cliente("João Silva", "12345678901", null, 28, "888888888", "Avenida XYZ, 456", "nacional");
+        Cliente cliente3 = new Cliente("Ana Souza", "11223344556", null, 25, "777777777", "Rua 456, 789", "nacional");
 
-        // Criando pacotes fixos (exemplo)
-        pacoteService.adicionarPacote(new PacoteViagem("Aventura Amazônica", "Amazonas", 7, "Aventura", 2500.00f, "Passeios em trilhas e visita a comunidades indígenas."));
-        pacoteService.adicionarPacote(new PacoteViagem("Romance em Gramado", "Gramado - RS", 5, "Romântico", 3200.00f, "Pacote especial para casais com fondue e city tour."));
-        pacoteService.adicionarPacote(new PacoteViagem("Cultura em Ouro Preto", "Ouro Preto - MG", 3, "Cultural", 1500.00f, "Visitas guiadas aos museus e igrejas históricas."));
-        pacoteService.adicionarPacote(new PacoteViagem("Sol e Praia em Fortaleza", "Fortaleza - CE", 6, "Praia", 2800.00f, "Pacote com hotel à beira-mar e passeios de buggy."));
-        pacoteService.adicionarPacote(new PacoteViagem("Natureza em Bonito", "Bonito - MS", 5, "Ecoturismo", 2900.00f, "Flutuação nos rios cristalinos e visita às grutas."));
+        clienteDAO.inserirCliente(cliente1);
+        clienteDAO.inserirCliente(cliente2);
+        clienteDAO.inserirCliente(cliente3);
 
-        // Menu principal
-        boolean continuar = true;
-        while (continuar) {
-            String[] opcoes = {"Listar Pacotes", "Selecionar Pacote", "Sair"};
-            int escolha = JOptionPane.showOptionDialog(null, "Bem-vindo à Agência de Viagens!", "Menu Principal",
-                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoes, opcoes[0]);
+        // Listando todos os clientes após inserção
+        System.out.println("Lista de Clientes após inserção:");
+        clienteDAO.listarClientes().forEach(cliente -> System.out.println(cliente));
 
-            switch (escolha) {
-                case 0:
-                    pacoteService.listarPacotes();
-                    break;
-                case 1:
-                    PacoteViagem selecionado = pacoteService.selecionarPacote();
-                    if (selecionado != null) {
-                        JOptionPane.showMessageDialog(null, "Você escolheu:\n\n" + selecionado.toString(), "Pacote Selecionado", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                    break;
-                default:
-                    continuar = false;
-                    break;
-            }
-        }
+        // Inserir Pacote de Viagem
+        PacoteViagem pacote1 = new PacoteViagem("Pacote de Férias para Paris", "Paris, França", 7, "Romântico", 4500.00f, "Inclui passagem aérea e hotel 5 estrelas.");
+        PacoteViagem pacote2 = new PacoteViagem("Viagem Cultural para Roma", "Roma, Itália", 10, "Cultural", 5500.00f, "Inclui ingressos para museus e passeios históricos.");
 
-        JOptionPane.showMessageDialog(null, "Obrigado por usar a Agência de Viagens!", "Encerrando", JOptionPane.INFORMATION_MESSAGE);
+        pacoteDAO.salvar(pacote1);
+        pacoteDAO.salvar(pacote2);
+
+        // Listando todos os pacotes após inserção
+        System.out.println("\nLista de Pacotes de Viagem após inserção:");
+        pacoteDAO.listar().forEach(pacote -> System.out.println(pacote));
+
+        // Excluindo um Cliente (pelo CPF)
+        System.out.println("\nExcluindo cliente com CPF 12345678901...");
+        clienteDAO.deletarCliente("12345678901");
+
+        // Listando todos os clientes após exclusão
+        System.out.println("\nLista de Clientes após exclusão:");
+        clienteDAO.listarClientes().forEach(cliente -> System.out.println(cliente));
     }
 }

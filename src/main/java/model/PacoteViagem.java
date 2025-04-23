@@ -4,8 +4,8 @@ public class PacoteViagem {
     private int id;
     private String nome;
     private String destino;
-    private int duracao; // dias
-    private String tipo; // Cultural, Romântico, etc.
+    private int duracao;
+    private String tipo;
     private float preco;
     private String detalhes;
 

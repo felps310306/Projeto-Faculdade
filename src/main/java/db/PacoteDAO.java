@@ -1,13 +1,14 @@
 package db;
 
 import model.PacoteViagem;
+import model.Cliente;
 import util.ConexaoBD;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacoteDao {
+public class PacoteDAO {
 
     public void salvar(PacoteViagem pacote) {
         String sql = "INSERT INTO pacotes (nome, preco, duracao, tipo, detalhes, destino) VALUES (?, ?, ?, ?, ?, ?)";
@@ -55,5 +56,37 @@ public class PacoteDao {
         }
 
         return pacotes;
+    }
+
+    // Método para listar clientes que adquiriram um determinado pacote
+    public List<Cliente> listarClientesPacote(int pacoteId) {
+        List<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT c.* FROM clientes c "
+                + "JOIN clientes_pacotes cp ON c.id = cp.cliente_id "
+                + "WHERE cp.pacote_id = ?";
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, pacoteId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Cliente cliente = new Cliente(
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getString("tipo_cliente"),
+                        rs.getInt("idade"),
+                        rs.getString("telefone"),
+                        rs.getString("endereco"),
+                        rs.getString("passaporte")
+                );
+                clientes.add(cliente);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return clientes;
     }
 }

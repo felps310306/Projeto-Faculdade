@@ -12,13 +12,11 @@ public class BDUtils {
     private static final String USER = "root"; // Seu usuário do MySQL
     private static final String PASSWORD = "felipedeus13"; // Sua senha do MySQL
 
-    // Método para abrir a conexão com o banco de dados
     public static Connection getConnection() throws SQLException {
         Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
         return conn;
     }
 
-    // Método para fechar a conexão com o banco
     public static void closeConnection(Connection conn) {
         if (conn != null) {
             try {
@@ -29,7 +27,6 @@ public class BDUtils {
         }
     }
 
-    // Método para fechar o Statement
     public static void closeStatement(Statement stmt) {
         if (stmt != null) {
             try {
