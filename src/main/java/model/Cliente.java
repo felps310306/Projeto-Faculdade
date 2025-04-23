@@ -41,12 +41,11 @@ public class Cliente {
     public void setEndereco(String endereco) { this.endereco = endereco; }
     public void setTipoCliente(String tipoCliente) { this.tipoCliente = tipoCliente; }
 
-    // Método de validação
     public boolean isValido() {
         if ("nacional".equals(tipoCliente)) {
-            return cpf != null && !cpf.isEmpty(); // Para cliente nacional, CPF é obrigatório
+            return cpf != null && !cpf.isEmpty();
         } else if ("estrangeiro".equals(tipoCliente)) {
-            return passaporte != null && !passaporte.isEmpty(); // Para cliente estrangeiro, passaporte é obrigatório
+            return passaporte != null && !passaporte.isEmpty();
         }
         return false;
     }
