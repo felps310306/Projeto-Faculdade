@@ -25,7 +25,7 @@ public class ServicoAdicionalService {
             return;
         }
 
-        // Exibindo os clientes para o usuário escolher
+
         String[] nomesClientes = new String[clientes.size()];
         for (int i = 0; i < clientes.size(); i++) {
             nomesClientes[i] = clientes.get(i).getNome(); // Exibindo nome do cliente
@@ -51,13 +51,11 @@ public class ServicoAdicionalService {
             int escolhaServico = JOptionPane.showOptionDialog(null, "Escolha um serviço adicional para o cliente " + clienteEscolhido.getNome() + ":",
                     "Escolher Serviço Adicional", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, nomesServicos, nomesServicos[0]);
 
-            // Caso o usuário tenha escolhido um serviço
+
             if (escolhaServico >= 0) {
                 ServicoAdicional servicoEscolhido = servicos.get(escolhaServico);
 
-                // Associar o serviço ao cliente
-                // Aqui você pode implementar a lógica de associar realmente no banco de dados,
-                // ou adicionar o serviço a uma lista de serviços do cliente, dependendo de como o sistema foi estruturado.
+
                 clienteDAO.associarServicoAoCliente(clienteEscolhido, servicoEscolhido);
 
                 JOptionPane.showMessageDialog(null, "Serviço " + servicoEscolhido.getNome() + " associado ao cliente " + clienteEscolhido.getNome(),

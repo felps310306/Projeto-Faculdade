@@ -19,7 +19,6 @@ public class PacoteServicoDAO {
         }
     }
 
-    // Método para associar um pacote a um serviço adicional
     public void associarPacoteServico(int pacoteId, int servicoId) {
         String sql = "INSERT INTO pacotes_servicos (pacote_id, servico_id) VALUES (?, ?)";
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
@@ -32,7 +31,6 @@ public class PacoteServicoDAO {
         }
     }
 
-    // Método para listar os serviços adicionais de um pacote
     public List<ServicoAdicional> listarServicosPorPacote(int pacoteId) {
         List<ServicoAdicional> servicos = new ArrayList<>();
         String sql = "SELECT s.* FROM servicos_adicionais s " +

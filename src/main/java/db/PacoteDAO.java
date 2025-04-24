@@ -58,7 +58,6 @@ public class PacoteDAO {
         return pacotes;
     }
 
-    // Método para listar clientes que adquiriram um determinado pacote
     public List<Cliente> listarClientesPacote(int pacoteId) {
         List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT c.* FROM clientes c "

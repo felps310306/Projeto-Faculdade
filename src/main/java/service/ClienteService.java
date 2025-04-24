@@ -51,16 +51,13 @@ public class ClienteService {
     }
 
     public void excluirCliente() {
-        // Perguntar ao usuário se ele vai usar CPF ou Passaporte
         String tipoIdentificacao = JOptionPane.showInputDialog("Digite o tipo de identificação para excluir (CPF/Passaporte):");
 
-        // Validar tipo de identificação
         if (!tipoIdentificacao.equalsIgnoreCase("CPF") && !tipoIdentificacao.equalsIgnoreCase("Passaporte")) {
             JOptionPane.showMessageDialog(null, "Tipo de identificação inválido. O cadastro será cancelado.", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Solicitar a identificação correspondente
         String identificacaoExcluir = JOptionPane.showInputDialog("Digite o " + tipoIdentificacao + " do cliente para excluir:");
 
         // Excluir cliente com base no tipo de identificação
@@ -87,7 +84,6 @@ public class ClienteService {
         int pacoteEscolhido = Integer.parseInt(pacoteEscolhidoStr) - 1;
         PacoteViagem pacoteSelecionado = pacotesDisponiveis.get(pacoteEscolhido);
 
-        // Solicitar CPF ou passaporte do cliente
         String identificacaoCliente = JOptionPane.showInputDialog("Digite o CPF ou Passaporte do cliente para associar a um pacote:");
         clienteDAO.associarClientePacote(identificacaoCliente, pacoteSelecionado.getId());
         JOptionPane.showMessageDialog(null, "Cliente associado ao pacote com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -104,12 +100,10 @@ public class ClienteService {
         } else {
             StringBuilder pacotesClienteList = new StringBuilder("Pacotes de Viagem do Cliente:\n");
 
-            // Exibindo pacotes
             for (PacoteViagem p : pacotesEServicos.getPacotes()) {
                 pacotesClienteList.append(p).append("\n");
             }
 
-            // Exibindo serviços
             if (!pacotesEServicos.getServicos().isEmpty()) {
                 pacotesClienteList.append("\nServiços Adicionais do Cliente:\n");
                 for (ServicoAdicional s : pacotesEServicos.getServicos()) {

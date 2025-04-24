@@ -2,10 +2,12 @@ package util;
 
 import java.util.regex.Pattern;
 
+
+// Futuramente para uso
 public class Validacoes {
 
     public static boolean validarCpf(String cpf) {
-        // Regex simplificado apenas para verificar o formato (não valida o cálculo do CPF)
+        //
         String regex = "^[0-9]{11}$";
         return cpf != null && cpf.matches(regex);
     }
