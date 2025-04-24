@@ -2,6 +2,7 @@ package db;
 
 import model.Cliente;
 import model.PacoteViagem;
+import model.ServicoAdicional;
 import util.ConexaoBD;
 
 import java.sql.*;
@@ -68,11 +69,9 @@ public class ClienteDAO {
     }
 
     public void associarClientePacote(String identificacao, int pacoteId) {
-        // Identificação pode ser CPF ou Passaporte
         String sql = "SELECT id FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1";
 
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
-            // Verificando se o identificador é um CPF ou passaporte
             ps.setString(1, identificacao);
             ps.setString(2, identificacao);
 
@@ -81,7 +80,6 @@ public class ClienteDAO {
             if (rs.next()) {
                 int clienteId = rs.getInt("id");
 
-                // Agora associamos o cliente ao pacote
                 String associarSQL = "INSERT INTO clientes_pacotes (cliente_id, pacote_id) VALUES (?, ?)";
                 try (PreparedStatement psAssoc = conexao.prepareStatement(associarSQL)) {
                     psAssoc.setInt(1, clienteId);
@@ -98,7 +96,36 @@ public class ClienteDAO {
         }
     }
 
-    // Método para listar pacotes de um cliente usando CPF
+    // Método para associar um serviço adicional ao cliente
+    public void associarServicoAoCliente(Cliente cliente, ServicoAdicional servico) {
+        String sql = "SELECT id FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1";
+
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, cliente.getCpf());
+            ps.setString(2, cliente.getCpf());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int clienteId = rs.getInt("id");
+
+                // Associa o cliente ao serviço adicional
+                String associarSQL = "INSERT INTO clientes_servicos (cliente_id, servico_id) VALUES (?, ?)";
+                try (PreparedStatement psAssoc = conexao.prepareStatement(associarSQL)) {
+                    psAssoc.setInt(1, clienteId);
+                    psAssoc.setInt(2, servico.getId());
+                    psAssoc.executeUpdate();
+                    System.out.println("Serviço associado ao cliente com sucesso!");
+                }
+            } else {
+                System.out.println("Cliente não encontrado com o CPF ou passaporte fornecido.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<PacoteViagem> listarPacotesClientePorCpf(String cpf) {
         List<PacoteViagem> pacotes = new ArrayList<>();
         String sql = "SELECT p.* FROM pacotes p "
@@ -130,7 +157,6 @@ public class ClienteDAO {
         return pacotes;
     }
 
-    // Método para listar todos os clientes
     public List<Cliente> listarClientes() {
         List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM clientes";
@@ -155,7 +181,6 @@ public class ClienteDAO {
         return clientes;
     }
 
-    // Método para excluir um cliente pelo CPF
     public void deletarCliente(String cpf) {
         String sql = "DELETE FROM clientes WHERE cpf = ?";
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
