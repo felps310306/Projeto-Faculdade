@@ -19,6 +19,26 @@ public class ClienteDAO {
         }
     }
 
+    public boolean deletarClientePorIdentificacao(String identificacao, String tipoIdentificacao) {
+        String sql = "";
+
+        if (tipoIdentificacao.equalsIgnoreCase("CPF")) {
+            sql = "DELETE FROM clientes WHERE cpf = ?";
+        } else if (tipoIdentificacao.equalsIgnoreCase("Passaporte")) {
+            sql = "DELETE FROM clientes WHERE passaporte = ?";
+        }
+
+        try (Connection conn = ConexaoBD.conectar(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, identificacao);
+            int rowsAffected = stmt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void inserirCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes (nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
