@@ -14,13 +14,12 @@ import javax.swing.*;
 public class Main {
 
     public static void main(String[] args) {
-        // Verificando a conexão com o banco de dados
+
         if (!ConexaoBD.testarConexao()) {
             JOptionPane.showMessageDialog(null, "Erro ao conectar com o banco de dados. O programa será encerrado.", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Instanciando os DAOs e serviços
         ServicoAdicionalDAO servicoDAO = new ServicoAdicionalDAO();
         ClienteDAO clienteDAO = new ClienteDAO();
         PacoteDAO pacoteDAO = new PacoteDAO();
@@ -29,7 +28,6 @@ public class Main {
         ClienteService clienteService = new ClienteService(clienteDAO);
         PacoteService pacoteService = new PacoteService(pacoteDAO);
 
-        // Menu de opções
         boolean continuar = true;
         while (continuar) {
             String[] opcoes = {"Cadastrar Cliente", "Listar Clientes", "Escolher Pacote", "Escolher Serviço Adicional", "Excluir Cliente", "Listar Pacotes de Cliente", "Sair"};
@@ -50,8 +48,7 @@ public class Main {
                     break;
 
                 case 3:
-                    // Remover a linha abaixo e substituir por
-                    servicoAdicionalService.escolherEAssociarServicoAoCliente(); // Chama o método correto
+                    servicoAdicionalService.escolherEAssociarServicoAoCliente();
                     break;
 
 
