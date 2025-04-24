@@ -1,0 +1,16 @@
+🎯 Como usar o sistema da Agência de Viagens:
+Abra o projeto no seu ambiente Java (ex: IntelliJ, Eclipse, VS Code)
+
+Configure seu banco MySQL com o script de criação do banco.
+
+Execute a classe Main.java
+
+Use o menu interativo para:
+
+Cadastrar clientes
+
+Associar pacotes e serviços
+
+Listar clientes, pacotes e o que foi contratado
+
+Excluir registros
