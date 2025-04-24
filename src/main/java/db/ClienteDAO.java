@@ -2,6 +2,7 @@ package db;
 
 import model.Cliente;
 import model.PacoteViagem;
+import model.PacotesEServicosCliente;
 import model.ServicoAdicional;
 import util.ConexaoBD;
 
@@ -126,36 +127,61 @@ public class ClienteDAO {
         }
     }
 
-    public List<PacoteViagem> listarPacotesClientePorCpf(String cpf) {
+    public PacotesEServicosCliente listarPacotesClientePorCpf(String identificacao) {
         List<PacoteViagem> pacotes = new ArrayList<>();
-        String sql = "SELECT p.* FROM pacotes p "
+        List<ServicoAdicional> servicos = new ArrayList<>();
+
+        String sqlPacotes = "SELECT p.* FROM pacotes p "
                 + "JOIN clientes_pacotes cp ON p.id = cp.pacote_id "
                 + "JOIN clientes c ON c.id = cp.cliente_id "
-                + "WHERE c.cpf = ?";
+                + "WHERE c.cpf = ? OR c.passaporte = ?";
 
-        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
-            ps.setString(1, cpf);
-            ResultSet rs = ps.executeQuery();
+        String sqlServicos = "SELECT s.* FROM servicos_adicionais s "
+                + "JOIN clientes_servicos cs ON s.id = cs.servico_id "
+                + "JOIN clientes c ON c.id = cs.cliente_id "
+                + "WHERE c.cpf = ? OR c.passaporte = ?";
 
-            while (rs.next()) {
+        try (PreparedStatement psPacotes = conexao.prepareStatement(sqlPacotes);
+             PreparedStatement psServicos = conexao.prepareStatement(sqlServicos)) {
+
+            psPacotes.setString(1, identificacao);
+            psPacotes.setString(2, identificacao);
+            ResultSet rsPacotes = psPacotes.executeQuery();
+
+            while (rsPacotes.next()) {
                 PacoteViagem pacote = new PacoteViagem(
-                        rs.getString("nome"),
-                        rs.getString("destino"),
-                        rs.getInt("duracao"),
-                        rs.getString("tipo"),
-                        rs.getFloat("preco"),
-                        rs.getString("detalhes")
+                        rsPacotes.getString("nome"),
+                        rsPacotes.getString("destino"),
+                        rsPacotes.getInt("duracao"),
+                        rsPacotes.getString("tipo"),
+                        rsPacotes.getFloat("preco"),
+                        rsPacotes.getString("detalhes")
                 );
-                pacote.setId(rs.getInt("id"));
+                pacote.setId(rsPacotes.getInt("id"));
                 pacotes.add(pacote);
+            }
+
+            psServicos.setString(1, identificacao);
+            psServicos.setString(2, identificacao);
+            ResultSet rsServicos = psServicos.executeQuery();
+
+            while (rsServicos.next()) {
+                ServicoAdicional servico = new ServicoAdicional(
+                        rsServicos.getString("nome"),
+                        rsServicos.getString("descricao"),
+                        rsServicos.getFloat("preco")
+                );
+                servico.setId(rsServicos.getInt("id"));
+                servicos.add(servico);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return pacotes;
+        return new PacotesEServicosCliente(pacotes, servicos);
     }
+
 
     public List<Cliente> listarClientes() {
         List<Cliente> clientes = new ArrayList<>();

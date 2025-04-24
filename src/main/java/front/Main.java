@@ -30,7 +30,7 @@ public class Main {
 
         boolean continuar = true;
         while (continuar) {
-            String[] opcoes = {"Cadastrar Cliente", "Listar Clientes", "Escolher Pacote", "Escolher Serviço Adicional", "Excluir Cliente", "Listar Pacotes de Cliente", "Sair"};
+            String[] opcoes = {"Cadastrar Cliente", "Listar Clientes", "Escolher Pacote", "Escolher Serviço Adicional", "Excluir Cliente", "Listar pacotes e serviços", "Sair"};
             int escolha = JOptionPane.showOptionDialog(null, "Bem-vindo à Agência de Viagens!", "Menu Principal",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoes, opcoes[0]);
 

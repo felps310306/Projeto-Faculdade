@@ -3,6 +3,9 @@ package service;
 import db.ClienteDAO;
 import model.Cliente;
 import model.PacoteViagem;
+import model.PacotesEServicosCliente;
+import model.ServicoAdicional;
+
 import javax.swing.*;
 import java.util.List;
 
@@ -93,17 +96,29 @@ public class ClienteService {
     public void listarPacotesDeCliente() {
         String identificacaoClientePacote = JOptionPane.showInputDialog("Digite o CPF ou Passaporte do cliente para listar seus pacotes:");
 
-        // Listar pacotes do cliente baseado em CPF ou Passaporte
-        List<PacoteViagem> pacotesCliente = clienteDAO.listarPacotesClientePorCpf(identificacaoClientePacote);
+        // Listar pacotes e serviços do cliente baseado em CPF ou Passaporte
+        PacotesEServicosCliente pacotesEServicos = clienteDAO.listarPacotesClientePorCpf(identificacaoClientePacote);
 
-        if (pacotesCliente.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Este cliente não possui pacotes associados.", "Pacotes de Cliente", JOptionPane.INFORMATION_MESSAGE);
+        if (pacotesEServicos.getPacotes().isEmpty() && pacotesEServicos.getServicos().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Este cliente não possui pacotes ou serviços associados.", "Pacotes e Serviços de Cliente", JOptionPane.INFORMATION_MESSAGE);
         } else {
             StringBuilder pacotesClienteList = new StringBuilder("Pacotes de Viagem do Cliente:\n");
-            for (PacoteViagem p : pacotesCliente) {
+
+            // Exibindo pacotes
+            for (PacoteViagem p : pacotesEServicos.getPacotes()) {
                 pacotesClienteList.append(p).append("\n");
             }
-            JOptionPane.showMessageDialog(null, pacotesClienteList.toString(), "Pacotes de Cliente", JOptionPane.INFORMATION_MESSAGE);
+
+            // Exibindo serviços
+            if (!pacotesEServicos.getServicos().isEmpty()) {
+                pacotesClienteList.append("\nServiços Adicionais do Cliente:\n");
+                for (ServicoAdicional s : pacotesEServicos.getServicos()) {
+                    pacotesClienteList.append(s).append("\n");
+                }
+            }
+
+            JOptionPane.showMessageDialog(null, pacotesClienteList.toString(), "Pacotes e Serviços de Cliente", JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
 }

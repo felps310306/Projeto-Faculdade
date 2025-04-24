@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PacoteViagem {
     private int id;
     private String nome;
@@ -8,6 +11,7 @@ public class PacoteViagem {
     private String tipo;
     private float preco;
     private String detalhes;
+    private List<ServicoAdicional> servicosAdicionais = new ArrayList<>();
 
     public PacoteViagem() {}
 
@@ -41,8 +45,31 @@ public class PacoteViagem {
     public String getDetalhes() { return detalhes; }
     public void setDetalhes(String detalhes) { this.detalhes = detalhes; }
 
+    public List<ServicoAdicional> getServicosAdicionais() {
+        return servicosAdicionais;
+    }
+
+    public void setServicosAdicionais(List<ServicoAdicional> servicosAdicionais) {
+        this.servicosAdicionais = servicosAdicionais;
+    }
+
     @Override
     public String toString() {
-        return "Nome: " + nome + "\nDestino: " + destino + "\nDuração: " + duracao + " dias\nTipo: " + tipo + "\nPreço: R$" + preco + "\nDetalhes: " + detalhes;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Nome: ").append(nome)
+                .append("\nDestino: ").append(destino)
+                .append("\nDuração: ").append(duracao).append(" dias")
+                .append("\nTipo: ").append(tipo)
+                .append("\nPreço: R$").append(preco)
+                .append("\nDetalhes: ").append(detalhes);
+
+        if (!servicosAdicionais.isEmpty()) {
+            sb.append("\nServiços Adicionais:");
+            for (ServicoAdicional servico : servicosAdicionais) {
+                sb.append("\n - ").append(servico.getNome()).append(" (R$").append(servico.getPreco()).append(")");
+            }
+        }
+
+        return sb.toString();
     }
 }
