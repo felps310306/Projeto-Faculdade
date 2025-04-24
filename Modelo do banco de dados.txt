@@ -1,0 +1,75 @@
+-- Criação do banco de dados
+DROP DATABASE IF EXISTS agencia_viagens;
+CREATE DATABASE agencia_viagens;
+USE agencia_viagens;
+
+-- Tabela de clientes
+CREATE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(11) UNIQUE,
+    passaporte VARCHAR(20),
+    tipo_cliente ENUM('nacional', 'estrangeiro') NOT NULL,
+    idade INT NOT NULL,
+    telefone VARCHAR(15) NOT NULL,
+    endereco VARCHAR(255) NOT NULL
+);
+
+-- Tabela de pacotes de viagem
+CREATE TABLE pacotes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    preco FLOAT NOT NULL,
+    duracao INT NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    detalhes TEXT,
+    destino VARCHAR(100) NOT NULL
+);
+
+-- Tabela de serviços adicionais
+CREATE TABLE servicos_adicionais (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco FLOAT NOT NULL
+);
+
+-- Relacionamento entre clientes e pacotes
+CREATE TABLE clientes_pacotes (
+    cliente_id INT NOT NULL,
+    pacote_id INT NOT NULL,
+    PRIMARY KEY (cliente_id, pacote_id),
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (pacote_id) REFERENCES pacotes(id) ON DELETE CASCADE
+);
+
+-- Relacionamento entre pacotes e serviços adicionais
+CREATE TABLE pacotes_servicos (
+    pacote_id INT NOT NULL,
+    servico_id INT NOT NULL,
+    PRIMARY KEY (pacote_id, servico_id),
+    FOREIGN KEY (pacote_id) REFERENCES pacotes(id) ON DELETE CASCADE,
+    FOREIGN KEY (servico_id) REFERENCES servicos_adicionais(id) ON DELETE CASCADE
+);
+
+-- Relacionamento entre clientes e serviços (vinculados ao pedido do cliente)
+CREATE TABLE clientes_servicos (
+    cliente_id INT NOT NULL,
+    servico_id INT NOT NULL,
+    PRIMARY KEY (cliente_id, servico_id),
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (servico_id) REFERENCES servicos_adicionais(id) ON DELETE CASCADE
+);
+
+-- Libera atualizações seguras para poder fazer remoções manuais
+SET SQL_SAFE_UPDATES = 0;
+
+-- (Opcional) Remove pacotes duplicados com mesmo nome, mantendo o mais antigo
+DELETE p1
+FROM pacotes p1
+JOIN pacotes p2 ON p1.nome = p2.nome AND p1.id > p2.id;
+
+-- Consultas úteis para ver os dados
+SELECT * FROM clientes;
+SELECT * FROM pacotes;
+SELECT * FROM servicos_adicionais;

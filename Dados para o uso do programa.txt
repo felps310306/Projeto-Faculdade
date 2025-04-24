@@ -1,0 +1,18 @@
+Dados ficticios para o uso do programa, podendo adicionar direto por ele ou manualmente pelo banco de dados 
+
+
+-- Inserindo clientes
+INSERT INTO clientes (nome, cpf, passaporte, idade, telefone, endereco, tipo_cliente)
+VALUES 
+('Maria Oliveira', '98765432100', NULL, 30, '999999999', 'Rua ABC, 123', 'nacional'),
+('João Silva', '12345678901', NULL, 28, '888888888', 'Avenida XYZ, 456', 'nacional'),
+('Ana Souza', '11223344556', NULL, 25, '777777777', 'Rua 456, 789', 'nacional');
+
+-- Inserindo pacotes de viagem
+INSERT INTO pacotes (nome, destino, duracao, tipo, preco, detalhes)
+VALUES
+('Aventura Amazônica', 'Amazonas', 7, 'Aventura', 2500.00, 'Passeios em trilhas e visita a comunidades indígenas.'),
+('Romance em Gramado', 'Gramado - RS', 5, 'Romântico', 3200.00, 'Pacote especial para casais com fondue e city tour.'),
+('Cultura em Ouro Preto', 'Ouro Preto - MG', 3, 'Cultural', 1500.00, 'Visitas guiadas aos museus e igrejas históricas.'),
+('Sol e Praia em Fortaleza', 'Fortaleza - CE', 6, 'Praia', 2800.00, 'Pacote com hotel à beira-mar e passeios de buggy.'),
+('Natureza em Bonito', 'Bonito - MS', 5, 'Ecoturismo', 2900.00, 'Flutuação nos rios cristalinos e visita às grutas.');
