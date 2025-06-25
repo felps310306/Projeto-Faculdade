@@ -60,7 +60,9 @@ public class PacoteDAO {
 
     public List<Cliente> listarClientesPacote(int pacoteId) {
         List<Cliente> clientes = new ArrayList<>();
-        String sql = "SELECT c.* FROM clientes c "
+        // 1. AJUSTAR A QUERY SQL: Selecionar o 'id' e o 'email' da tabela 'clientes'
+        String sql = "SELECT c.id, c.nome, c.cpf, c.passaporte, c.idade, c.telefone, c.endereco, c.tipo_cliente, c.email " // ADICIONADO c.id E c.email
+                + "FROM clientes c "
                 + "JOIN clientes_pacotes cp ON c.id = cp.cliente_id "
                 + "WHERE cp.pacote_id = ?";
 
@@ -70,15 +72,29 @@ public class PacoteDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+
+                int id = rs.getInt("id"); // Pegar o ID também
+                String nome = rs.getString("nome");
+                String cpf = rs.getString("cpf");
+                // CUIDADO: Seu construtor Cliente espera passaporte como 3º parâmetro, não tipo_cliente
+                String passaporte = rs.getString("passaporte"); // Pega passaporte
+                int idade = rs.getInt("idade");
+                String telefone = rs.getString("telefone");
+                String endereco = rs.getString("endereco");
+                String tipoCliente = rs.getString("tipo_cliente"); // Pega tipo_cliente
+                String email = rs.getString("email"); // Pega email
+
                 Cliente cliente = new Cliente(
-                        rs.getString("nome"),
-                        rs.getString("cpf"),
-                        rs.getString("tipo_cliente"),
-                        rs.getInt("idade"),
-                        rs.getString("telefone"),
-                        rs.getString("endereco"),
-                        rs.getString("passaporte")
+                        nome,
+                        cpf,
+                        passaporte, // Agora este é o 3º parâmetro
+                        idade,
+                        telefone,
+                        endereco,
+                        tipoCliente, // Agora este é o 7º parâmetro
+                        email        // Agora este é o 8º e último parâmetro
                 );
+                cliente.setId(id); // Setar o ID no objeto Cliente
                 clientes.add(cliente);
             }
 

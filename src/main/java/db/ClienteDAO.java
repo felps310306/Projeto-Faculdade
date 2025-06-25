@@ -185,11 +185,14 @@ public class ClienteDAO {
 
     public List<Cliente> listarClientes() {
         List<Cliente> clientes = new ArrayList<>();
-        String sql = "SELECT * FROM clientes";
-        try (Statement stmt = conexao.createStatement();
+        // É uma boa prática listar explicitamente as colunas, incluindo 'id' e 'email'
+        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes"; // ADICIONADO 'id' e 'email' no SELECT
+        try (Connection conn = ConexaoBD.conectar(); // Re-abrindo conexão aqui
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                int id = rs.getInt("id"); // Pegar o ID também
                 String nome = rs.getString("nome");
                 String cpf = rs.getString("cpf");
                 int idade = rs.getInt("idade");
@@ -197,8 +200,11 @@ public class ClienteDAO {
                 String endereco = rs.getString("endereco");
                 String tipoCliente = rs.getString("tipo_cliente");
                 String passaporte = rs.getString("passaporte");
+                String email = rs.getString("email");
 
-                Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente);
+                // O construtor Cliente agora tem 8 parâmetros + o ID setado separadamente
+                Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // ADICIONADO EMAIL
+                cliente.setId(id); // Definir o ID que foi pego
                 clientes.add(cliente);
             }
         } catch (SQLException e) {
@@ -219,12 +225,15 @@ public class ClienteDAO {
     }
 
     public Cliente buscarClientePorCpfOuPassaporte(String identificacao) {
-        String sql = "SELECT * FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1"; // <<< CORRIGIDO PARA 'clientes'
-        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+        // Adicione 'id' e 'email' no SELECT
+        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1"; // ADICIONADO 'id' e 'email' no SELECT
+        try (Connection conn = ConexaoBD.conectar(); // Re-abrindo conexão aqui
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, identificacao);
             ps.setString(2, identificacao);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    int id = rs.getInt("id"); // Pegar o ID
                     String nome = rs.getString("nome");
                     String cpf = rs.getString("cpf");
                     int idade = rs.getInt("idade");
@@ -232,10 +241,10 @@ public class ClienteDAO {
                     String endereco = rs.getString("endereco");
                     String tipoCliente = rs.getString("tipo_cliente");
                     String passaporte = rs.getString("passaporte");
-                    int id = rs.getInt("id");
+                    String email = rs.getString("email");
 
-                    Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente);
-                    cliente.setId(id);
+                    Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // ADICIONADO EMAIL
+                    cliente.setId(id); // Definir o ID no objeto Cliente
                     return cliente;
                 }
             }
@@ -243,7 +252,7 @@ public class ClienteDAO {
             System.err.println("Erro ao buscar cliente por identificação: " + e.getMessage());
             e.printStackTrace();
         }
-        return null;
+        return null; // Retorna null se não encontrar
     }
 
 }

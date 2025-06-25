@@ -4,10 +4,11 @@ package front;
 import service.ClienteService;
 import service.PacoteService;
 import service.ServicoAdicionalService;
-import model.Cliente; // Importar a classe Cliente do pacote model
-import model.PacoteViagem; // Importar a classe PacoteViagem do pacote model
-import model.ServicoAdicional; // Importar a classe ServicoAdicional do pacote model
-import model.PacotesEServicosCliente; // Importar a classe PacotesEServicosCliente do pacote model
+import model.Cliente;
+import model.PacoteViagem;
+import model.ServicoAdicional;
+import model.PacotesEServicosCliente;
+import util.Validacoes; // IMPORTANTE: Adicione esta linha para importar sua classe de validação
 
 import javax.swing.*;
 import java.awt.*;
@@ -96,36 +97,72 @@ public class AgenciaViagensGUI extends JFrame {
     // --- Métodos para cada funcionalidade da GUI ---
 
     private void cadastrarClienteGUI() {
-        // Usa JOptionPanes para coletar os dados do cliente
+        // Coleta e valida o Nome
         String nome = JOptionPane.showInputDialog(this, "Digite o nome do cliente:");
-        if (nome == null || nome.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nome do cliente não pode ser vazio.", "Erro", JOptionPane.ERROR_MESSAGE);
+        if (!Validacoes.validarCampoObrigatorio(nome)) {
+            JOptionPane.showMessageDialog(this, "Nome do cliente é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // Coleta e valida o CPF
         String cpf = JOptionPane.showInputDialog(this, "Digite o CPF do cliente:");
-        if (cpf == null || cpf.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "CPF do cliente não pode ser vazio.", "Erro", JOptionPane.ERROR_MESSAGE);
+        if (!Validacoes.validarCampoObrigatorio(cpf)) {
+            JOptionPane.showMessageDialog(this, "CPF do cliente é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Validacoes.validarCpf(cpf)) {
+            JOptionPane.showMessageDialog(this, "CPF inválido. Deve conter 11 dígitos numéricos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // Coleta e valida a Idade
         String idadeStr = JOptionPane.showInputDialog(this, "Digite a idade do cliente:");
         int idade = 0;
+        if (!Validacoes.validarCampoObrigatorio(idadeStr)) {
+            JOptionPane.showMessageDialog(this, "Idade do cliente é obrigatória.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
-            if (idadeStr != null && !idadeStr.trim().isEmpty()) {
-                idade = Integer.parseInt(idadeStr);
+            idade = Integer.parseInt(idadeStr);
+            if (!Validacoes.validarIdade(idade)) {
+                JOptionPane.showMessageDialog(this, "Idade inválida. Digite um número entre 1 e 119.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+                return;
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Idade inválida. Digite um número.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Idade inválida. Digite um número inteiro.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        String telefone = JOptionPane.showInputDialog(this, "Digite o telefone do cliente:");
-        // Telefone pode ser null/vazio, não vamos validar estritamente aqui
+        // Coleta e valida o Telefone
+        String telefone = JOptionPane.showInputDialog(this, "Digite o telefone do cliente (ex: (XX) 9XXXX-XXXX):");
+        if (!Validacoes.validarCampoObrigatorio(telefone)) {
+            JOptionPane.showMessageDialog(this, "Telefone do cliente é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Validacoes.validarTelefone(telefone)) {
+            JOptionPane.showMessageDialog(this, "Telefone inválido. Formato esperado: (XX) 9XXXX-XXXX.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        // Coleta e valida o Endereço
         String endereco = JOptionPane.showInputDialog(this, "Digite o endereço do cliente:");
-        // Endereco pode ser null/vazio
+        if (!Validacoes.validarCampoObrigatorio(endereco)) {
+            JOptionPane.showMessageDialog(this, "Endereço do cliente é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        // Coleta e valida o Email
+        String email = JOptionPane.showInputDialog(this, "Digite o email do cliente:");
+        if (!Validacoes.validarCampoObrigatorio(email)) {
+            JOptionPane.showMessageDialog(this, "Email do cliente é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Validacoes.validarEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Email inválido. Verifique o formato (ex: nome@dominio.com).", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Coleta o Tipo de Cliente
         String[] tiposCliente = {"nacional", "estrangeiro"};
         String tipoCliente = (String) JOptionPane.showInputDialog(this,
                 "Selecione o tipo de cliente:",
@@ -139,18 +176,30 @@ public class AgenciaViagensGUI extends JFrame {
             return;
         }
 
+        // Coleta e valida o Passaporte (apenas se for estrangeiro)
         String passaporte = null;
         if (tipoCliente.equals("estrangeiro")) {
-            passaporte = JOptionPane.showInputDialog(this, "Digite o passaporte do cliente estrangeiro:");
-            if (passaporte == null || passaporte.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Passaporte não pode ser vazio para cliente estrangeiro.", "Erro", JOptionPane.ERROR_MESSAGE);
+            passaporte = JOptionPane.showInputDialog(this, "Digite o passaporte do cliente estrangeiro (9 dígitos):");
+            if (!Validacoes.validarCampoObrigatorio(passaporte)) {
+                JOptionPane.showMessageDialog(this, "Passaporte é obrigatório para cliente estrangeiro.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!Validacoes.validarPassaporte(passaporte)) {
+                JOptionPane.showMessageDialog(this, "Passaporte inválido. Deve conter 9 dígitos numéricos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
 
-        Cliente novoCliente = new Cliente(nome, cpf, passaporte, idade, telefone, endereco, tipoCliente);
-        clienteService.cadastrarClienteGUI(novoCliente); // Chama o novo método no ClienteService
-        JOptionPane.showMessageDialog(this, "Cliente cadastrado com sucesso (ou erro, verifique o console/listagem).");
+        // Se todas as validações passarem, cria o objeto Cliente e tenta cadastrar
+        Cliente novoCliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // AGORA PASSA O EMAIL
+
+        // Chama o método no ClienteService e verifica o resultado
+        if (clienteService.cadastrarClienteGUI(novoCliente)) {
+            JOptionPane.showMessageDialog(this, "Cliente cadastrado com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Falha ao cadastrar cliente. Verifique o console para mais detalhes.", "Erro no Cadastro", JOptionPane.ERROR_MESSAGE);
+        }
+
         listarClientesGUI(); // Atualiza a lista após o cadastro
     }
 
@@ -164,7 +213,7 @@ public class AgenciaViagensGUI extends JFrame {
         } else {
             displayArea.append("--- Lista de Clientes ---\n");
             for (Cliente cliente : clientes) {
-                displayArea.append("ID: " + cliente.getId() + "\n"); // Adicione o ID se disponível
+                displayArea.append("ID: " + cliente.getId() + "\n");
                 displayArea.append("  Nome: " + cliente.getNome() + "\n");
                 displayArea.append("  CPF: " + cliente.getCpf() + "\n");
                 displayArea.append("  Idade: " + cliente.getIdade() + "\n");
@@ -174,16 +223,16 @@ public class AgenciaViagensGUI extends JFrame {
                 if (cliente.getPassaporte() != null && !cliente.getPassaporte().isEmpty()) {
                     displayArea.append("  Passaporte: " + cliente.getPassaporte() + "\n");
                 }
+                displayArea.append("  Email: " + cliente.getEmail() + "\n"); // EXIBE O EMAIL
                 displayArea.append("-------------------------\n");
             }
         }
     }
 
     private void associarPacoteGUI() {
-        // Exemplo simples. O ideal seria listar clientes e pacotes antes de pedir IDs.
         String identificacaoCliente = JOptionPane.showInputDialog(this, "Digite o CPF ou Passaporte do cliente:");
-        if (identificacaoCliente == null || identificacaoCliente.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Identificação do cliente não pode ser vazia.", "Erro", JOptionPane.ERROR_MESSAGE);
+        if (!Validacoes.validarCampoObrigatorio(identificacaoCliente)) {
+            JOptionPane.showMessageDialog(this, "Identificação do cliente não pode ser vazia.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -207,25 +256,28 @@ public class AgenciaViagensGUI extends JFrame {
 
         String pacoteIdStr = JOptionPane.showInputDialog(this, "Pacotes Disponíveis:\n" + pacotesStr.toString() + "\n\nDigite o ID do pacote a ser associado:");
         int pacoteId = 0;
+        if (!Validacoes.validarCampoObrigatorio(pacoteIdStr)) {
+            JOptionPane.showMessageDialog(this, "ID do pacote é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
-            if (pacoteIdStr != null && !pacoteIdStr.trim().isEmpty()) {
-                pacoteId = Integer.parseInt(pacoteIdStr);
-            } else {
-                return; // Usuário cancelou ou digitou vazio
-            }
+            pacoteId = Integer.parseInt(pacoteIdStr);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "ID do pacote inválido. Digite um número.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "ID do pacote inválido. Digite um número.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        clienteService.associarClientePacote(identificacaoCliente, pacoteId); // Chama o método do service
-        JOptionPane.showMessageDialog(this, "Associação de pacote realizada (ou erro, verifique o console/listagem).");
+        if (clienteService.associarClientePacote(identificacaoCliente, pacoteId)) {
+            JOptionPane.showMessageDialog(this, "Associação de pacote realizada com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Falha ao associar pacote. Verifique o console para mais detalhes.", "Erro na Associação", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void associarServicoGUI() {
         String identificacaoCliente = JOptionPane.showInputDialog(this, "Digite o CPF ou Passaporte do cliente:");
-        if (identificacaoCliente == null || identificacaoCliente.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Identificação do cliente não pode ser vazia.", "Erro", JOptionPane.ERROR_MESSAGE);
+        if (!Validacoes.validarCampoObrigatorio(identificacaoCliente)) {
+            JOptionPane.showMessageDialog(this, "Identificação do cliente não pode ser vazia.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -248,14 +300,14 @@ public class AgenciaViagensGUI extends JFrame {
 
         String servicoIdStr = JOptionPane.showInputDialog(this, "Serviços Adicionais Disponíveis:\n" + servicosStr.toString() + "\n\nDigite o ID do serviço a ser associado:");
         int servicoId = 0;
+        if (!Validacoes.validarCampoObrigatorio(servicoIdStr)) {
+            JOptionPane.showMessageDialog(this, "ID do serviço é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
-            if (servicoIdStr != null && !servicoIdStr.trim().isEmpty()) {
-                servicoId = Integer.parseInt(servicoIdStr);
-            } else {
-                return; // Usuário cancelou ou digitou vazio
-            }
+            servicoId = Integer.parseInt(servicoIdStr);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "ID do serviço inválido. Digite um número.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "ID do serviço inválido. Digite um número.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -264,8 +316,11 @@ public class AgenciaViagensGUI extends JFrame {
         ServicoAdicional servicoParaAssociar = servicoAdicionalService.buscarServicoPorId(servicoId);
 
         if (clienteParaAssociar != null && servicoParaAssociar != null) {
-            servicoAdicionalService.associarServicoAoClienteGUI(clienteParaAssociar, servicoParaAssociar); // Chama o novo método no service
-            JOptionPane.showMessageDialog(this, "Associação de serviço realizada (ou erro, verifique o console/listagem).");
+            if (servicoAdicionalService.associarServicoAoClienteGUI(clienteParaAssociar, servicoParaAssociar)) {
+                JOptionPane.showMessageDialog(this, "Associação de serviço realizada com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Falha ao associar serviço. Verifique o console para mais detalhes.", "Erro na Associação", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Cliente ou Serviço não encontrado. Verifique os IDs.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
@@ -274,8 +329,8 @@ public class AgenciaViagensGUI extends JFrame {
 
     private void excluirClienteGUI() {
         String identificacao = JOptionPane.showInputDialog(this, "Digite o CPF ou Passaporte do cliente a ser excluído:");
-        if (identificacao == null || identificacao.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Identificação não pode ser vazia.", "Erro", JOptionPane.ERROR_MESSAGE);
+        if (!Validacoes.validarCampoObrigatorio(identificacao)) {
+            JOptionPane.showMessageDialog(this, "Identificação não pode ser vazia.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -292,6 +347,17 @@ public class AgenciaViagensGUI extends JFrame {
             return;
         }
 
+        // Validação adicional se for CPF ou Passaporte
+        if (tipoIdentificacao.equalsIgnoreCase("CPF") && !Validacoes.validarCpf(identificacao)) {
+            JOptionPane.showMessageDialog(this, "CPF inválido. Deve conter 11 dígitos numéricos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (tipoIdentificacao.equalsIgnoreCase("Passaporte") && !Validacoes.validarPassaporte(identificacao)) {
+            JOptionPane.showMessageDialog(this, "Passaporte inválido. Deve conter 9 dígitos numéricos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
         boolean sucesso = clienteService.deletarClientePorIdentificacao(identificacao, tipoIdentificacao);
         if (sucesso) {
             JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
@@ -303,8 +369,8 @@ public class AgenciaViagensGUI extends JFrame {
 
     private void listarPacotesServicosGUI() {
         String identificacao = JOptionPane.showInputDialog(this, "Digite o CPF ou Passaporte do cliente para listar pacotes e serviços:");
-        if (identificacao == null || identificacao.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Identificação não pode ser vazia.", "Erro", JOptionPane.ERROR_MESSAGE);
+        if (!Validacoes.validarCampoObrigatorio(identificacao)) {
+            JOptionPane.showMessageDialog(this, "Identificação não pode ser vazia.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 

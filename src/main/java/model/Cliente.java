@@ -9,10 +9,11 @@ public class Cliente {
     private String telefone;
     private String endereco;
     private String tipoCliente;  // 'nacional' ou 'estrangeiro'
+    private String email;
 
     public Cliente() {}
 
-    public Cliente(String nome, String cpf, String passaporte, int idade, String telefone, String endereco, String tipoCliente) {
+    public Cliente(String nome, String cpf, String passaporte, int idade, String telefone, String endereco, String tipoCliente, String email) {
         this.nome = nome;
         this.cpf = cpf;
         this.passaporte = passaporte;
@@ -20,6 +21,7 @@ public class Cliente {
         this.telefone = telefone;
         this.endereco = endereco;
         this.tipoCliente = tipoCliente;
+        this.email = email;
     }
 
     public int getId() { return id; }
@@ -32,6 +34,16 @@ public class Cliente {
     public String getTelefone() { return telefone; }
     public String getEndereco() { return endereco; }
     public String getTipoCliente() { return tipoCliente; }
+
+    // --- ADICIONE ESTES MÉTODOS PARA O EMAIL ---
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    // --- FIM DA ADIÇÃO ---
 
     public void setNome(String nome) { this.nome = nome; }
     public void setCpf(String cpf) { this.cpf = cpf; }
@@ -54,6 +66,7 @@ public class Cliente {
     public String toString() {
         return "Nome: " + nome + "\n" +
                 (tipoCliente.equals("nacional") ? "CPF: " + cpf : "Passaporte: " + passaporte) + "\n" +
-                "Idade: " + idade + "\nTelefone: " + telefone + "\nEndereço: " + endereco;
+                "Idade: " + idade + "\nTelefone: " + telefone + "\nEndereço: " + endereco +
+                "\nEmail: " + email;
     }
 }
