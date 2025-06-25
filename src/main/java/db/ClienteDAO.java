@@ -219,7 +219,7 @@ public class ClienteDAO {
     }
 
     public Cliente buscarClientePorCpfOuPassaporte(String identificacao) {
-        String sql = "SELECT * FROM cliente WHERE cpf = ? OR passaporte = ? LIMIT 1";
+        String sql = "SELECT * FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1"; // <<< CORRIGIDO PARA 'clientes'
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
             ps.setString(1, identificacao);
             ps.setString(2, identificacao);
@@ -232,10 +232,10 @@ public class ClienteDAO {
                     String endereco = rs.getString("endereco");
                     String tipoCliente = rs.getString("tipo_cliente");
                     String passaporte = rs.getString("passaporte");
-                    int id = rs.getInt("id"); // Pegar o ID também!
+                    int id = rs.getInt("id");
 
                     Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente);
-                    cliente.setId(id); // Definir o ID no objeto Cliente
+                    cliente.setId(id);
                     return cliente;
                 }
             }
@@ -243,7 +243,7 @@ public class ClienteDAO {
             System.err.println("Erro ao buscar cliente por identificação: " + e.getMessage());
             e.printStackTrace();
         }
-        return null; // Retorna null se não encontrar
+        return null;
     }
 
 }
