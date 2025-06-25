@@ -42,8 +42,8 @@ public class ClienteDAO {
     }
 
     public void inserirCliente(Cliente cliente) {
-        String sql = "INSERT INTO clientes (nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+        String sql = "INSERT INTO clientes (nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = ConexaoBD.conectar(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, cliente.getNome());
             ps.setString(2, cliente.getCpf());
             ps.setInt(3, cliente.getIdade());
@@ -61,6 +61,8 @@ public class ClienteDAO {
             } else {
                 ps.setNull(7, Types.VARCHAR);
             }
+
+            ps.setString(8, cliente.getEmail());
 
             ps.executeUpdate();
             System.out.println("Cliente inserido com sucesso!");
@@ -183,28 +185,26 @@ public class ClienteDAO {
     }
 
 
+
     public List<Cliente> listarClientes() {
         List<Cliente> clientes = new ArrayList<>();
-        // É uma boa prática listar explicitamente as colunas, incluindo 'id' e 'email'
-        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes"; // ADICIONADO 'id' e 'email' no SELECT
-        try (Connection conn = ConexaoBD.conectar(); // Re-abrindo conexão aqui
+        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes";
+        try (Connection conn = ConexaoBD.conectar();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                int id = rs.getInt("id"); // Pegar o ID também
-                String nome = rs.getString("nome");
-                String cpf = rs.getString("cpf");
-                int idade = rs.getInt("idade");
-                String telefone = rs.getString("telefone");
-                String endereco = rs.getString("endereco");
-                String tipoCliente = rs.getString("tipo_cliente");
-                String passaporte = rs.getString("passaporte");
-                String email = rs.getString("email");
+                Cliente cliente = new Cliente();
+                cliente.setId(rs.getInt("id"));
+                cliente.setNome(rs.getString("nome"));
+                cliente.setCpf(rs.getString("cpf"));
+                cliente.setIdade(rs.getInt("idade"));
+                cliente.setTelefone(rs.getString("telefone"));
+                cliente.setEndereco(rs.getString("endereco"));
+                cliente.setTipoCliente(rs.getString("tipo_cliente"));
+                cliente.setPassaporte(rs.getString("passaporte"));
+                cliente.setEmail(rs.getString("email")); // Lendo e definindo o email
 
-                // O construtor Cliente agora tem 8 parâmetros + o ID setado separadamente
-                Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // ADICIONADO EMAIL
-                cliente.setId(id); // Definir o ID que foi pego
                 clientes.add(cliente);
             }
         } catch (SQLException e) {
@@ -212,6 +212,7 @@ public class ClienteDAO {
         }
         return clientes;
     }
+
 
     public void deletarCliente(String cpf) {
         String sql = "DELETE FROM clientes WHERE cpf = ?";
@@ -224,27 +225,28 @@ public class ClienteDAO {
         }
     }
 
+    // CORRIGIDO: Leitura e atribuição do email ao objeto Cliente
     public Cliente buscarClientePorCpfOuPassaporte(String identificacao) {
-        // Adicione 'id' e 'email' no SELECT
-        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1"; // ADICIONADO 'id' e 'email' no SELECT
-        try (Connection conn = ConexaoBD.conectar(); // Re-abrindo conexão aqui
+        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes WHERE cpf = ? OR passaporte = ?";
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, identificacao);
             ps.setString(2, identificacao);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    int id = rs.getInt("id"); // Pegar o ID
-                    String nome = rs.getString("nome");
-                    String cpf = rs.getString("cpf");
-                    int idade = rs.getInt("idade");
-                    String telefone = rs.getString("telefone");
-                    String endereco = rs.getString("endereco");
-                    String tipoCliente = rs.getString("tipo_cliente");
-                    String passaporte = rs.getString("passaporte");
-                    String email = rs.getString("email");
+                    Cliente cliente = new Cliente();
+                    cliente.setId(rs.getInt("id"));
+                    cliente.setNome(rs.getString("nome"));
+                    cliente.setCpf(rs.getString("cpf"));
+                    cliente.setIdade(rs.getInt("idade"));
+                    cliente.setTelefone(rs.getString("telefone"));
+                    cliente.setEndereco(rs.getString("endereco"));
+                    cliente.setTipoCliente(rs.getString("tipo_cliente"));
+                    cliente.setPassaporte(rs.getString("passaporte"));
+                    cliente.setEmail(rs.getString("email")); // Lendo e definindo o email
 
-                    Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // ADICIONADO EMAIL
-                    cliente.setId(id); // Definir o ID no objeto Cliente
                     return cliente;
                 }
             }
@@ -252,7 +254,8 @@ public class ClienteDAO {
             System.err.println("Erro ao buscar cliente por identificação: " + e.getMessage());
             e.printStackTrace();
         }
-        return null; // Retorna null se não encontrar
+        return null;
     }
+
 
 }

@@ -3,7 +3,6 @@ package util;
 import java.util.regex.Pattern;
 
 
-// Futuramente para uso
 public class Validacoes {
 
     public static boolean validarCpf(String cpf) {
