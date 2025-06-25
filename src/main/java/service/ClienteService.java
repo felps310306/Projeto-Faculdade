@@ -6,113 +6,99 @@ import model.PacoteViagem;
 import model.PacotesEServicosCliente;
 import model.ServicoAdicional;
 
-import javax.swing.*;
 import java.util.List;
 
 public class ClienteService {
 
     private ClienteDAO clienteDAO;
+    // O PacoteService não precisa ser um campo aqui para 'associarClientePacote'
+    // Ele será passado como parâmetro quando necessário, ou a lógica de listagem de pacotes
+    // pode ser feita na própria GUI ou em um novo método de PacoteService se for o caso.
 
     public ClienteService(ClienteDAO clienteDAO) {
         this.clienteDAO = clienteDAO;
     }
 
-    public void cadastrarCliente() {
-        String tipoCliente = JOptionPane.showInputDialog("Digite o tipo de cliente (nacional/estrangeiro):");
-
-        String nome = JOptionPane.showInputDialog("Digite o nome do cliente:");
-        int idade = Integer.parseInt(JOptionPane.showInputDialog("Digite a idade do cliente:"));
-        String telefone = JOptionPane.showInputDialog("Digite o telefone do cliente:");
-        String endereco = JOptionPane.showInputDialog("Digite o endereço do cliente:");
-
-        String cpfOuPassaporte = "";
-        if ("nacional".equalsIgnoreCase(tipoCliente)) {
-            cpfOuPassaporte = JOptionPane.showInputDialog("Digite o CPF do cliente:");
-        } else if ("estrangeiro".equalsIgnoreCase(tipoCliente)) {
-            cpfOuPassaporte = JOptionPane.showInputDialog("Digite o Passaporte do cliente:");
-        } else {
-            JOptionPane.showMessageDialog(null, "Tipo de cliente inválido. O cadastro será cancelado.", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Cliente cliente = new Cliente(nome, cpfOuPassaporte, tipoCliente.equals("estrangeiro") ? cpfOuPassaporte : null, idade, telefone, endereco, tipoCliente);
-
-        clienteDAO.inserirCliente(cliente);
-        JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void listarClientes() {
-        List<Cliente> clientes = clienteDAO.listarClientes();
-        StringBuilder clientesList = new StringBuilder("Lista de Clientes:\n");
-        for (Cliente c : clientes) {
-            clientesList.append(c).append("\n");
-        }
-        JOptionPane.showMessageDialog(null, clientesList.toString(), "Clientes", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void excluirCliente() {
-        String tipoIdentificacao = JOptionPane.showInputDialog("Digite o tipo de identificação para excluir (CPF/Passaporte):");
-
-        if (!tipoIdentificacao.equalsIgnoreCase("CPF") && !tipoIdentificacao.equalsIgnoreCase("Passaporte")) {
-            JOptionPane.showMessageDialog(null, "Tipo de identificação inválido. O cadastro será cancelado.", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String identificacaoExcluir = JOptionPane.showInputDialog("Digite o " + tipoIdentificacao + " do cliente para excluir:");
-
-        // Excluir cliente com base no tipo de identificação
-        boolean sucesso = clienteDAO.deletarClientePorIdentificacao(identificacaoExcluir, tipoIdentificacao);
-
-        if (sucesso) {
-            JOptionPane.showMessageDialog(null, "Cliente excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(null, "Cliente não encontrado. Verifique a identificação e tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+    /**
+     * NOVO: Método para cadastrar cliente recebendo o objeto Cliente diretamente da GUI.
+     * @param cliente O objeto Cliente a ser inserido.
+     * @return true se o cliente foi inserido com sucesso, false caso contrário.
+     */
+    public boolean cadastrarClienteGUI(Cliente cliente) {
+        try {
+            clienteDAO.inserirCliente(cliente);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Erro ao cadastrar cliente: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 
-
-    public void associarClientePacote(PacoteService pacoteService) {
-        // Listar pacotes disponíveis
-        List<PacoteViagem> pacotesDisponiveis = pacoteService.listarPacotes();
-        StringBuilder pacotesList = new StringBuilder("Pacotes Disponíveis:\n");
-        for (int i = 0; i < pacotesDisponiveis.size(); i++) {
-            PacoteViagem p = pacotesDisponiveis.get(i);
-            pacotesList.append(i + 1).append(" - ").append(p.getNome()).append(" - ").append(p.getDestino()).append("\n");
-        }
-
-        String pacoteEscolhidoStr = JOptionPane.showInputDialog(null, pacotesList.toString() + "\nDigite o número do pacote que deseja associar:");
-        int pacoteEscolhido = Integer.parseInt(pacoteEscolhidoStr) - 1;
-        PacoteViagem pacoteSelecionado = pacotesDisponiveis.get(pacoteEscolhido);
-
-        String identificacaoCliente = JOptionPane.showInputDialog("Digite o CPF ou Passaporte do cliente para associar a um pacote:");
-        clienteDAO.associarClientePacote(identificacaoCliente, pacoteSelecionado.getId());
-        JOptionPane.showMessageDialog(null, "Cliente associado ao pacote com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    /**
+     * MANTIDO: Retorna a lista de clientes.
+     * A exibição da lista será feita pela GUI.
+     * @return Uma lista de objetos Cliente.
+     */
+    public List<Cliente> listarClientes() {
+        return clienteDAO.listarClientes();
     }
 
-    public void listarPacotesDeCliente() {
-        String identificacaoClientePacote = JOptionPane.showInputDialog("Digite o CPF ou Passaporte do cliente para listar seus pacotes:");
-
-        // Listar pacotes e serviços do cliente baseado em CPF ou Passaporte
-        PacotesEServicosCliente pacotesEServicos = clienteDAO.listarPacotesClientePorCpf(identificacaoClientePacote);
-
-        if (pacotesEServicos.getPacotes().isEmpty() && pacotesEServicos.getServicos().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Este cliente não possui pacotes ou serviços associados.", "Pacotes e Serviços de Cliente", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            StringBuilder pacotesClienteList = new StringBuilder("Pacotes de Viagem do Cliente:\n");
-
-            for (PacoteViagem p : pacotesEServicos.getPacotes()) {
-                pacotesClienteList.append(p).append("\n");
-            }
-
-            if (!pacotesEServicos.getServicos().isEmpty()) {
-                pacotesClienteList.append("\nServiços Adicionais do Cliente:\n");
-                for (ServicoAdicional s : pacotesEServicos.getServicos()) {
-                    pacotesClienteList.append(s).append("\n");
-                }
-            }
-
-            JOptionPane.showMessageDialog(null, pacotesClienteList.toString(), "Pacotes e Serviços de Cliente", JOptionPane.INFORMATION_MESSAGE);
+    /**
+     * NOVO: Método para excluir cliente recebendo a identificação e o tipo diretamente da GUI.
+     * @param identificacao O CPF ou Passaporte do cliente.
+     * @param tipoIdentificacao "CPF" ou "Passaporte".
+     * @return true se o cliente foi excluído com sucesso, false caso contrário.
+     */
+    public boolean deletarClientePorIdentificacao(String identificacao, String tipoIdentificacao) {
+        try {
+            return clienteDAO.deletarClientePorIdentificacao(identificacao, tipoIdentificacao);
+        } catch (Exception e) {
+            System.err.println("Erro ao excluir cliente: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 
+    /**
+     * NOVO: Método para associar cliente a pacote recebendo a identificação do cliente e o ID do pacote.
+     * A listagem de pacotes e a escolha agora ficam a cargo da GUI.
+     * @param identificacaoCliente CPF ou Passaporte do cliente.
+     * @param pacoteId ID do pacote de viagem a ser associado.
+     * @return true se a associação foi bem-sucedida, false caso contrário.
+     */
+    public boolean associarClientePacote(String identificacaoCliente, int pacoteId) {
+        try {
+            clienteDAO.associarClientePacote(identificacaoCliente, pacoteId);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Erro ao associar cliente ao pacote: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * NOVO: Método para listar pacotes e serviços de um cliente recebendo a identificação.
+     * A exibição da lista agora será feita pela GUI.
+     * @param identificacao CPF ou Passaporte do cliente.
+     * @return Objeto PacotesEServicosCliente contendo as listas de pacotes e serviços.
+     */
+    public PacotesEServicosCliente listarPacotesDeClienteGUI(String identificacao) {
+        return clienteDAO.listarPacotesClientePorCpf(identificacao);
+    }
+
+    /**
+     * NOVO: Método para buscar um cliente por identificação (CPF ou Passaporte).
+     * Essencial para a GUI obter o objeto Cliente para associar a serviços.
+     * VOCÊ PRECISARÁ ADICIONAR ESTE MÉTODO NO SEU ClienteDAO!
+     * @param identificacao CPF ou Passaporte do cliente.
+     * @return O objeto Cliente encontrado, ou null se não for encontrado.
+     */
+    public Cliente buscarClientePorIdentificacao(String identificacao) {
+        // Você precisará implementar um método no ClienteDAO que faça essa busca.
+        // Exemplo de como poderia ser no ClienteDAO:
+        // public Cliente buscarClientePorCpfOuPassaporte(String identificacao) { ... }
+        return clienteDAO.buscarClientePorCpfOuPassaporte(identificacao);
+    }
 }

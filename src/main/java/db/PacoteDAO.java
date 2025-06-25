@@ -88,4 +88,33 @@ public class PacoteDAO {
 
         return clientes;
     }
+
+    // Exemplo de como seria em db/PacoteDAO.java
+// Assumindo que PacoteViagem tem um construtor que aceita id
+    public PacoteViagem buscarPorId(int id) {
+        String sql = "SELECT * FROM pacotes WHERE id = ?";
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Crie e retorne o objeto PacoteViagem
+                    PacoteViagem pacote = new PacoteViagem(
+                            rs.getString("nome"),
+                            rs.getString("destino"),
+                            rs.getInt("duracao"),
+                            rs.getString("tipo"),
+                            rs.getFloat("preco"),
+                            rs.getString("detalhes")
+                    );
+                    pacote.setId(rs.getInt("id")); // Definir o ID
+                    return pacote;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar pacote por ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

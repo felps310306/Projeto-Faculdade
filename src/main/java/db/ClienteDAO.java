@@ -217,4 +217,33 @@ public class ClienteDAO {
             e.printStackTrace();
         }
     }
+
+    public Cliente buscarClientePorCpfOuPassaporte(String identificacao) {
+        String sql = "SELECT * FROM cliente WHERE cpf = ? OR passaporte = ? LIMIT 1";
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, identificacao);
+            ps.setString(2, identificacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String nome = rs.getString("nome");
+                    String cpf = rs.getString("cpf");
+                    int idade = rs.getInt("idade");
+                    String telefone = rs.getString("telefone");
+                    String endereco = rs.getString("endereco");
+                    String tipoCliente = rs.getString("tipo_cliente");
+                    String passaporte = rs.getString("passaporte");
+                    int id = rs.getInt("id"); // Pegar o ID também!
+
+                    Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente);
+                    cliente.setId(id); // Definir o ID no objeto Cliente
+                    return cliente;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar cliente por identificação: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null; // Retorna null se não encontrar
+    }
+
 }
