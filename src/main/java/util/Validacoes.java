@@ -13,7 +13,7 @@ public class Validacoes {
     }
 
     public static boolean validarTelefone(String telefone) {
-        String regex = "^\\(\\d{2}\\) \\d{5}-\\d{4}$";
+        String regex = "^\\d{10}$";
         return telefone != null && telefone.matches(regex);
     }
 
