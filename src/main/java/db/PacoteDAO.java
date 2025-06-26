@@ -13,18 +13,17 @@ public class PacoteDAO {
     public void salvar(PacoteViagem pacote) {
         String sql = "INSERT INTO pacotes (nome, preco, duracao, tipo, detalhes, destino) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = ConexaoBD.conectar()) {
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                stmt.setString(1, pacote.getNome());
-                stmt.setFloat(2, pacote.getPreco());
-                stmt.setInt(3, pacote.getDuracao());
-                stmt.setString(4, pacote.getTipo());
-                stmt.setString(5, pacote.getDetalhes());
-                stmt.setString(6, pacote.getDestino());
+            stmt.setString(1, pacote.getNome());
+            stmt.setFloat(2, pacote.getPreco());
+            stmt.setInt(3, pacote.getDuracao());
+            stmt.setString(4, pacote.getTipo());
+            stmt.setString(5, pacote.getDetalhes());
+            stmt.setString(6, pacote.getDestino());
 
-                stmt.executeUpdate();
-            }
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -60,11 +59,10 @@ public class PacoteDAO {
 
     public List<Cliente> listarClientesPacote(int pacoteId) {
         List<Cliente> clientes = new ArrayList<>();
-        // 1. AJUSTAR A QUERY SQL: Selecionar o 'id' e o 'email' da tabela 'clientes'
-        String sql = "SELECT c.id, c.nome, c.cpf, c.passaporte, c.idade, c.telefone, c.endereco, c.tipo_cliente, c.email " // ADICIONADO c.id E c.email
-                + "FROM clientes c "
-                + "JOIN clientes_pacotes cp ON c.id = cp.cliente_id "
-                + "WHERE cp.pacote_id = ?";
+        String sql = "SELECT c.id, c.nome, c.cpf, c.passaporte, c.idade, c.telefone, c.endereco, c.tipo_cliente, c.email " +
+                "FROM clientes c " +
+                "JOIN clientes_pacotes cp ON c.id = cp.cliente_id " +
+                "WHERE cp.pacote_id = ?";
 
         try (Connection conn = ConexaoBD.conectar();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -72,29 +70,17 @@ public class PacoteDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-
-                int id = rs.getInt("id"); // Pegar o ID também
-                String nome = rs.getString("nome");
-                String cpf = rs.getString("cpf");
-                // CUIDADO: Seu construtor Cliente espera passaporte como 3º parâmetro, não tipo_cliente
-                String passaporte = rs.getString("passaporte"); // Pega passaporte
-                int idade = rs.getInt("idade");
-                String telefone = rs.getString("telefone");
-                String endereco = rs.getString("endereco");
-                String tipoCliente = rs.getString("tipo_cliente"); // Pega tipo_cliente
-                String email = rs.getString("email"); // Pega email
-
                 Cliente cliente = new Cliente(
-                        nome,
-                        cpf,
-                        passaporte, // Agora este é o 3º parâmetro
-                        idade,
-                        telefone,
-                        endereco,
-                        tipoCliente, // Agora este é o 7º parâmetro
-                        email        // Agora este é o 8º e último parâmetro
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getString("passaporte"),
+                        rs.getInt("idade"),
+                        rs.getString("telefone"),
+                        rs.getString("endereco"),
+                        rs.getString("tipo_cliente"),
+                        rs.getString("email")
                 );
-                cliente.setId(id); // Setar o ID no objeto Cliente
+                cliente.setId(rs.getInt("id"));
                 clientes.add(cliente);
             }
 
@@ -105,8 +91,6 @@ public class PacoteDAO {
         return clientes;
     }
 
-    // Exemplo de como seria em db/PacoteDAO.java
-// Assumindo que PacoteViagem tem um construtor que aceita id
     public PacoteViagem buscarPorId(int id) {
         String sql = "SELECT * FROM pacotes WHERE id = ?";
         try (Connection conn = ConexaoBD.conectar();
@@ -114,7 +98,6 @@ public class PacoteDAO {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Crie e retorne o objeto PacoteViagem
                     PacoteViagem pacote = new PacoteViagem(
                             rs.getString("nome"),
                             rs.getString("destino"),
@@ -123,7 +106,7 @@ public class PacoteDAO {
                             rs.getFloat("preco"),
                             rs.getString("detalhes")
                     );
-                    pacote.setId(rs.getInt("id")); // Definir o ID
+                    pacote.setId(rs.getInt("id"));
                     return pacote;
                 }
             }

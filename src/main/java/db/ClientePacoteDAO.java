@@ -13,13 +13,14 @@ public class ClientePacoteDAO {
 
     public ClientePacoteDAO() {
         try {
-            conexao = ConexaoBD.conectar();
+            conexao = ConexaoBD.conectar(); // Abre conexão com o banco ao instanciar a DAO
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void associarClientePacote(int clienteId, int pacoteId) {
+        // Insere a relação entre cliente e pacote na tabela intermediária
         String sql = "INSERT INTO clientes_pacotes (cliente_id, pacote_id) VALUES (?, ?)";
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
             ps.setInt(1, clienteId);
@@ -32,6 +33,7 @@ public class ClientePacoteDAO {
     }
 
     public List<PacoteViagem> listarPacotesPorCliente(int clienteId) {
+        // Retorna todos os pacotes que um cliente contratou
         List<PacoteViagem> pacotes = new ArrayList<>();
         String sql = "SELECT p.* FROM pacotes p " +
                 "JOIN clientes_pacotes cp ON p.id = cp.pacote_id " +
@@ -40,6 +42,7 @@ public class ClientePacoteDAO {
             ps.setInt(1, clienteId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                // Monta o objeto PacoteViagem com os dados do banco
                 PacoteViagem pacote = new PacoteViagem(
                         rs.getString("nome"),
                         rs.getString("destino"),

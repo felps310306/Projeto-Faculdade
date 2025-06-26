@@ -15,13 +15,14 @@ public class ClienteDAO {
 
     public ClienteDAO() {
         try {
-            conexao = ConexaoBD.conectar();
+            conexao = ConexaoBD.conectar(); // Conecta com o banco assim que a DAO for criada
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public boolean deletarClientePorIdentificacao(String identificacao, String tipoIdentificacao) {
+        // Deleta cliente baseado no tipo de documento: CPF ou passaporte
         String sql = "";
 
         if (tipoIdentificacao.equalsIgnoreCase("CPF")) {
@@ -34,7 +35,7 @@ public class ClienteDAO {
             stmt.setString(1, identificacao);
             int rowsAffected = stmt.executeUpdate();
 
-            return rowsAffected > 0;
+            return rowsAffected > 0; // Retorna se conseguiu deletar ou não
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -42,8 +43,9 @@ public class ClienteDAO {
     }
 
     public void inserirCliente(Cliente cliente) {
-        String sql = "INSERT INTO clientes (nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+        // Insere cliente no banco com todos os dados, verificando se é nacional ou estrangeiro
+        String sql = "INSERT INTO clientes (nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = ConexaoBD.conectar(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, cliente.getNome());
             ps.setString(2, cliente.getCpf());
             ps.setInt(3, cliente.getIdade());
@@ -52,7 +54,7 @@ public class ClienteDAO {
 
             String tipoCliente = cliente.getTipoCliente();
             if (tipoCliente == null) {
-                tipoCliente = "nacional";
+                tipoCliente = "nacional"; // Define padrão como nacional
             }
             ps.setString(6, tipoCliente);
 
@@ -62,6 +64,8 @@ public class ClienteDAO {
                 ps.setNull(7, Types.VARCHAR);
             }
 
+            ps.setString(8, cliente.getEmail());
+
             ps.executeUpdate();
             System.out.println("Cliente inserido com sucesso!");
         } catch (SQLException e) {
@@ -70,6 +74,7 @@ public class ClienteDAO {
     }
 
     public void associarClientePacote(String identificacao, int pacoteId) {
+        // Busca o cliente e associa ele a um pacote de viagem
         String sql = "SELECT id FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1";
 
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
@@ -97,8 +102,8 @@ public class ClienteDAO {
         }
     }
 
-    // Método para associar um serviço adicional ao cliente
     public void associarServicoAoCliente(Cliente cliente, ServicoAdicional servico) {
+        // Associa um serviço adicional a um cliente já cadastrado
         String sql = "SELECT id FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1";
 
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
@@ -110,7 +115,6 @@ public class ClienteDAO {
             if (rs.next()) {
                 int clienteId = rs.getInt("id");
 
-                // Associa o cliente ao serviço adicional
                 String associarSQL = "INSERT INTO clientes_servicos (cliente_id, servico_id) VALUES (?, ?)";
                 try (PreparedStatement psAssoc = conexao.prepareStatement(associarSQL)) {
                     psAssoc.setInt(1, clienteId);
@@ -128,6 +132,7 @@ public class ClienteDAO {
     }
 
     public PacotesEServicosCliente listarPacotesClientePorCpf(String identificacao) {
+        // Busca os pacotes e serviços que um cliente contratou com base no CPF ou passaporte
         List<PacoteViagem> pacotes = new ArrayList<>();
         List<ServicoAdicional> servicos = new ArrayList<>();
 
@@ -144,6 +149,7 @@ public class ClienteDAO {
         try (PreparedStatement psPacotes = conexao.prepareStatement(sqlPacotes);
              PreparedStatement psServicos = conexao.prepareStatement(sqlServicos)) {
 
+            // Consulta pacotes
             psPacotes.setString(1, identificacao);
             psPacotes.setString(2, identificacao);
             ResultSet rsPacotes = psPacotes.executeQuery();
@@ -161,6 +167,7 @@ public class ClienteDAO {
                 pacotes.add(pacote);
             }
 
+            // Consulta serviços
             psServicos.setString(1, identificacao);
             psServicos.setString(2, identificacao);
             ResultSet rsServicos = psServicos.executeQuery();
@@ -182,29 +189,26 @@ public class ClienteDAO {
         return new PacotesEServicosCliente(pacotes, servicos);
     }
 
-
     public List<Cliente> listarClientes() {
+        // Lista todos os clientes cadastrados no banco
         List<Cliente> clientes = new ArrayList<>();
-        // É uma boa prática listar explicitamente as colunas, incluindo 'id' e 'email'
-        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes"; // ADICIONADO 'id' e 'email' no SELECT
-        try (Connection conn = ConexaoBD.conectar(); // Re-abrindo conexão aqui
+        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes";
+        try (Connection conn = ConexaoBD.conectar();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                int id = rs.getInt("id"); // Pegar o ID também
-                String nome = rs.getString("nome");
-                String cpf = rs.getString("cpf");
-                int idade = rs.getInt("idade");
-                String telefone = rs.getString("telefone");
-                String endereco = rs.getString("endereco");
-                String tipoCliente = rs.getString("tipo_cliente");
-                String passaporte = rs.getString("passaporte");
-                String email = rs.getString("email");
+                Cliente cliente = new Cliente();
+                cliente.setId(rs.getInt("id"));
+                cliente.setNome(rs.getString("nome"));
+                cliente.setCpf(rs.getString("cpf"));
+                cliente.setIdade(rs.getInt("idade"));
+                cliente.setTelefone(rs.getString("telefone"));
+                cliente.setEndereco(rs.getString("endereco"));
+                cliente.setTipoCliente(rs.getString("tipo_cliente"));
+                cliente.setPassaporte(rs.getString("passaporte"));
+                cliente.setEmail(rs.getString("email"));
 
-                // O construtor Cliente agora tem 8 parâmetros + o ID setado separadamente
-                Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // ADICIONADO EMAIL
-                cliente.setId(id); // Definir o ID que foi pego
                 clientes.add(cliente);
             }
         } catch (SQLException e) {
@@ -214,6 +218,7 @@ public class ClienteDAO {
     }
 
     public void deletarCliente(String cpf) {
+        // Deleta um cliente específico pelo CPF
         String sql = "DELETE FROM clientes WHERE cpf = ?";
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
             ps.setString(1, cpf);
@@ -225,26 +230,27 @@ public class ClienteDAO {
     }
 
     public Cliente buscarClientePorCpfOuPassaporte(String identificacao) {
-        // Adicione 'id' e 'email' no SELECT
-        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes WHERE cpf = ? OR passaporte = ? LIMIT 1"; // ADICIONADO 'id' e 'email' no SELECT
-        try (Connection conn = ConexaoBD.conectar(); // Re-abrindo conexão aqui
+        // Busca um cliente usando CPF ou passaporte
+        String sql = "SELECT id, nome, cpf, idade, telefone, endereco, tipo_cliente, passaporte, email FROM clientes WHERE cpf = ? OR passaporte = ?";
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, identificacao);
             ps.setString(2, identificacao);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    int id = rs.getInt("id"); // Pegar o ID
-                    String nome = rs.getString("nome");
-                    String cpf = rs.getString("cpf");
-                    int idade = rs.getInt("idade");
-                    String telefone = rs.getString("telefone");
-                    String endereco = rs.getString("endereco");
-                    String tipoCliente = rs.getString("tipo_cliente");
-                    String passaporte = rs.getString("passaporte");
-                    String email = rs.getString("email");
+                    Cliente cliente = new Cliente();
+                    cliente.setId(rs.getInt("id"));
+                    cliente.setNome(rs.getString("nome"));
+                    cliente.setCpf(rs.getString("cpf"));
+                    cliente.setIdade(rs.getInt("idade"));
+                    cliente.setTelefone(rs.getString("telefone"));
+                    cliente.setEndereco(rs.getString("endereco"));
+                    cliente.setTipoCliente(rs.getString("tipo_cliente"));
+                    cliente.setPassaporte(rs.getString("passaporte"));
+                    cliente.setEmail(rs.getString("email"));
 
-                    Cliente cliente = new Cliente(nome, cpf, tipoCliente.equals("nacional") ? null : passaporte, idade, telefone, endereco, tipoCliente, email); // ADICIONADO EMAIL
-                    cliente.setId(id); // Definir o ID no objeto Cliente
                     return cliente;
                 }
             }
@@ -252,7 +258,6 @@ public class ClienteDAO {
             System.err.println("Erro ao buscar cliente por identificação: " + e.getMessage());
             e.printStackTrace();
         }
-        return null; // Retorna null se não encontrar
+        return null;
     }
-
 }

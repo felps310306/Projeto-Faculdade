@@ -9,6 +9,7 @@ import java.util.List;
 
 public class ServicoAdicionalDAO {
 
+    // Salva um novo serviço adicional no banco
     public void salvar(ServicoAdicional servico) {
         String sql = "INSERT INTO servicos_adicionais (nome, descricao, preco) VALUES (?, ?, ?)";
 
@@ -25,6 +26,7 @@ public class ServicoAdicionalDAO {
         }
     }
 
+    // Retorna todos os serviços cadastrados
     public List<ServicoAdicional> listarTodos() {
         List<ServicoAdicional> lista = new ArrayList<>();
         String sql = "SELECT * FROM servicos_adicionais";
@@ -50,6 +52,7 @@ public class ServicoAdicionalDAO {
         return lista;
     }
 
+    // Busca um serviço pelo ID
     public ServicoAdicional buscarPorId(int id) {
         String sql = "SELECT * FROM servicos_adicionais WHERE id = ?";
         ServicoAdicional servico = null;
@@ -75,6 +78,7 @@ public class ServicoAdicionalDAO {
         return servico;
     }
 
+    // Deleta um serviço pelo ID
     public void deletarPorId(int id) {
         String sql = "DELETE FROM servicos_adicionais WHERE id = ?";
 
@@ -89,6 +93,7 @@ public class ServicoAdicionalDAO {
         }
     }
 
+    // Relaciona um serviço a um pacote
     public void associarServicoAoPacote(int pacoteId, int servicoId) {
         String sql = "INSERT INTO pacotes_servicos (pacote_id, servico_id) VALUES (?, ?)";
 
@@ -105,6 +110,7 @@ public class ServicoAdicionalDAO {
         }
     }
 
+    // Lista os serviços associados a um pacote específico
     public List<ServicoAdicional> listarServicosPorPacote(int pacoteId) {
         List<ServicoAdicional> lista = new ArrayList<>();
         String sql = "SELECT sa.* FROM servicos_adicionais sa " +

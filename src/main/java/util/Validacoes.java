@@ -3,17 +3,16 @@ package util;
 import java.util.regex.Pattern;
 
 
-// Futuramente para uso
 public class Validacoes {
 
     public static boolean validarCpf(String cpf) {
-        //
+
         String regex = "^[0-9]{11}$";
         return cpf != null && cpf.matches(regex);
     }
 
     public static boolean validarTelefone(String telefone) {
-        String regex = "^\\(\\d{2}\\) \\d{5}-\\d{4}$";
+        String regex = "^\\d{10}$";
         return telefone != null && telefone.matches(regex);
     }
 
