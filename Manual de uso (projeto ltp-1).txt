@@ -1,16 +1,76 @@
 🎯 Como usar o sistema da Agência de Viagens:
-Abra o projeto no seu ambiente Java (ex: IntelliJ, Eclipse, VS Code)
 
-Configure seu banco MySQL com o script de criação do banco.
+Versão: 1.0
+Data: 24 de Junho de 2025
 
-Execute a classe Main.java
+1. Introdução
+Bem-vindo ao Sistema de Agência de Viagens! Esta aplicação permite gerenciar informações de clientes, pacotes de viagem e serviços adicionais, além de associar pacotes e serviços a clientes.
 
-Use o menu interativo para:
+2. Requisitos do Sistema
+Java Runtime Environment (JRE) instalado.
+Conexão ativa com o banco de dados MySQL (agencia_viagens).
+3. Como Iniciar o Sistema
+Certifique-se de que seu servidor MySQL está em execução.
+Compile e execute o arquivo Main.java (geralmente executando a classe front.Main pela sua IDE, como IntelliJ IDEA).
+Se a conexão com o banco de dados for bem-sucedida, a janela principal do sistema ("Agência de Viagens - Menu Principal") será exibida. Caso contrário, uma mensagem de erro será mostrada e o programa será encerrado.
+4. Visão Geral da Interface Principal
+A janela principal é dividida em duas áreas principais:
 
-Cadastrar clientes
+Painel Superior (Botões de Ação): Contém os botões para realizar as diferentes operações do sistema.
+Área de Exibição (Caixa de Texto): Uma área de texto grande na parte inferior onde as listas de clientes, pacotes, serviços e resultados de operações serão exibidas.
+5. Funcionalidades do Sistema
+Utilize os botões no painel superior para interagir com o sistema.
 
-Associar pacotes e serviços
+5.1. Cadastrar Cliente
+Este botão permite adicionar um novo cliente ao sistema.
 
-Listar clientes, pacotes e o que foi contratado
+Clique no botão "Cadastrar Cliente".
+Serão solicitadas as seguintes informações uma a uma através de janelas pop-up:
+Nome do Cliente: (Obrigatório)
+CPF do Cliente: (Obrigatório, 11 dígitos numéricos, ex: 12345678901)
+Idade do Cliente: (Obrigatório, número inteiro entre 1 e 119)
+Telefone do Cliente: (Obrigatório, formato (XX) XXXXX-XXXX, ex: (11) 98765-4321)
+Endereço do Cliente: (Obrigatório)
+Email do Cliente: (Obrigatório, formato nome@dominio.com, ex: teste@agencia.com)
+Tipo de Cliente: Será exibida uma lista para escolher entre "nacional" ou "estrangeiro".
+Passaporte do Cliente: (Obrigatório se "estrangeiro" for selecionado, 9 dígitos numéricos, ex: 123456789)
+Após preencher todos os dados válidos, uma mensagem de sucesso ou falha será exibida. A lista de clientes na área de exibição será atualizada.
+5.2. Listar Clientes
+Este botão exibe todos os clientes cadastrados no sistema.
 
-Excluir registros
+Clique no botão "Listar Clientes".
+Uma lista detalhada de todos os clientes (ID, Nome, CPF/Passaporte, Idade, Telefone, Endereço, Tipo de Cliente, Email) será mostrada na Área de Exibição.
+5.3. Associar Pacote a Cliente
+Este botão permite vincular um pacote de viagem a um cliente existente.
+
+Clique no botão "Associar Pacote a Cliente".
+Será solicitado o CPF ou Passaporte do cliente. Digite a identificação e pressione OK.
+A Área de Exibição mostrará uma lista de Pacotes Disponíveis com seus IDs.
+Será solicitado o ID do pacote que você deseja associar. Digite o ID e pressione OK.
+Uma mensagem de sucesso ou falha na associação será exibida.
+5.4. Associar Serviço Adicional a Cliente
+Este botão permite vincular um serviço adicional a um cliente existente.
+
+Clique no botão "Associar Serviço Adicional a Cliente".
+Será solicitado o CPF ou Passaporte do cliente. Digite a identificação e pressione OK.
+A Área de Exibição mostrará uma lista de Serviços Adicionais Disponíveis com seus IDs.
+Será solicitado o ID do serviço que você deseja associar. Digite o ID e pressione OK.
+Uma mensagem de sucesso ou falha na associação será exibida.
+5.5. Excluir Cliente
+Este botão remove um cliente do sistema.
+
+Clique no botão "Excluir Cliente".
+Será solicitado o CPF ou Passaporte do cliente a ser excluído. Digite a identificação.
+Será solicitado o tipo de identificação (CPF ou Passaporte) para confirmar.
+Uma mensagem de sucesso ou falha na exclusão será exibida. A lista de clientes na área de exibição será atualizada.
+5.6. Listar Pacotes e Serviços do Cliente
+Este botão exibe todos os pacotes e serviços que estão associados a um cliente específico.
+
+Clique no botão "Listar Pacotes e Serviços do Cliente".
+Será solicitado o CPF ou Passaporte do cliente. Digite a identificação e pressione OK.
+A Área de Exibição mostrará os pacotes de viagem e os serviços adicionais associados a esse cliente. Se não houver associações, uma mensagem será exibida.
+6. Mensagens de Erro e Solução de Problemas Básica
+"Erro ao conectar com o banco de dados.": Verifique se o servidor MySQL está em execução e se as configurações de conexão em util.ConexaoBD estão corretas.
+"Nome do cliente é obrigatório." / "CPF inválido." / "Idade inválida." etc.: Essas são mensagens de validação. Preencha os campos com os formatos e valores esperados, conforme descrito na seção 5.1 Cadastrar Cliente.
+"Cliente ou Serviço não encontrado. Verifique os IDs.": Significa que a identificação do cliente (CPF/Passaporte) ou o ID do pacote/serviço que você digitou não corresponde a nenhum registro existente no banco de dados. Verifique a listagem antes de tentar associar.
+Mensagens no Console do IntelliJ: Se ocorrerem erros inesperados, verifique o console do IntelliJ IDEA para mensagens de erro mais detalhadas (stack trace).
