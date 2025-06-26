@@ -11,8 +11,9 @@ CREATE TABLE clientes (
     passaporte VARCHAR(20),
     tipo_cliente ENUM('nacional', 'estrangeiro') NOT NULL,
     idade INT NOT NULL,
-    telefone VARCHAR(15) NOT NULL,
-    endereco VARCHAR(255) NOT NULL
+    telefone VARCHAR(10) NOT NULL,
+    endereco VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE
 );
 
 -- Tabela de pacotes de viagem
@@ -74,11 +75,11 @@ SELECT * FROM clientes;
 SELECT * FROM pacotes;
 SELECT * FROM servicos_adicionais;
 
-INSERT INTO clientes (nome, cpf, passaporte, idade, telefone, endereco, tipo_cliente)
+INSERT INTO clientes (nome, cpf, passaporte, idade, telefone, endereco, tipo_cliente, email)
 VALUES 
-('Maria Oliveira', '98765432100', NULL, 30, '999999999', 'Rua ABC, 123', 'nacional'),
-('João Silva', '12345678901', NULL, 28, '888888888', 'Avenida XYZ, 456', 'nacional'),
-('Ana Souza', '11223344556', NULL, 25, '777777777', 'Rua 456, 789', 'nacional');
+('Maria Oliveira', '98765432100', NULL, 30, '999999999', 'Rua ABC, 123', 'nacional',"maria_oli@gmail.com"),
+('João Silva', '12345678901', NULL, 28, '888888888', 'Avenida XYZ, 456', 'nacional', "joao_silva@gmail.com"),
+('Ana Souza', '11223344556', NULL, 25, '777777777', 'Rua 456, 789', 'nacional', "ana_souza@gmail.com");
 
 -- Inserindo pacotes de viagem
 INSERT INTO pacotes (nome, destino, duracao, tipo, preco, detalhes)
@@ -106,6 +107,3 @@ INSERT INTO servicos_adicionais (nome, descricao, preco) VALUES
 ('Passeio Guiado pela Cidade', 'Tour guiado pelos principais pontos turísticos com acompanhamento bilíngue.', 80.50);
 
 USE agencia_viagens; -- Certifique-se de estar usando o banco de dados correto
-
-ALTER TABLE clientes
-ADD COLUMN email VARCHAR(255) UNIQUE;
