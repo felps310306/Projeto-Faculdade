@@ -134,7 +134,7 @@ public class AgenciaViagensGUI extends JFrame {
         }
 
         // Coleta e valida o Telefone
-        String telefone = JOptionPane.showInputDialog(this, "Digite o telefone do cliente (ex: (XX) 9XXXX-XXXX):");
+        String telefone = JOptionPane.showInputDialog(this, "Digite o telefone do cliente (ex: XXXXXXXXXX):");
         if (!Validacoes.validarCampoObrigatorio(telefone)) {
             JOptionPane.showMessageDialog(this, "Telefone do cliente é obrigatório.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;

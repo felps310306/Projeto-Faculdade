@@ -10,7 +10,7 @@ public class BDUtils {
 
     private static final String URL = "jdbc:mysql://localhost:3306/agencia_viagens"; // Ajuste conforme o nome do seu BD
     private static final String USER = "root"; // Seu usuário do MySQL
-    private static final String PASSWORD = "felipedeus13"; // Sua senha do MySQL
+    private static final String PASSWORD = "ceub123456"; // Sua senha do MySQL
 
     public static Connection getConnection() throws SQLException {
         Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
