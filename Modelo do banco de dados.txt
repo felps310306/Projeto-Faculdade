@@ -11,8 +11,9 @@ CREATE TABLE clientes (
     passaporte VARCHAR(20),
     tipo_cliente ENUM('nacional', 'estrangeiro') NOT NULL,
     idade INT NOT NULL,
-    telefone VARCHAR(15) NOT NULL,
-    endereco VARCHAR(255) NOT NULL
+    telefone VARCHAR(10) NOT NULL,
+    endereco VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE
 );
 
 -- Tabela de pacotes de viagem
@@ -73,3 +74,36 @@ JOIN pacotes p2 ON p1.nome = p2.nome AND p1.id > p2.id;
 SELECT * FROM clientes;
 SELECT * FROM pacotes;
 SELECT * FROM servicos_adicionais;
+
+INSERT INTO clientes (nome, cpf, passaporte, idade, telefone, endereco, tipo_cliente, email)
+VALUES 
+('Maria Oliveira', '98765432100', NULL, 30, '999999999', 'Rua ABC, 123', 'nacional',"maria_oli@gmail.com"),
+('João Silva', '12345678901', NULL, 28, '888888888', 'Avenida XYZ, 456', 'nacional', "joao_silva@gmail.com"),
+('Ana Souza', '11223344556', NULL, 25, '777777777', 'Rua 456, 789', 'nacional', "ana_souza@gmail.com");
+
+-- Inserindo pacotes de viagem
+INSERT INTO pacotes (nome, destino, duracao, tipo, preco, detalhes)
+VALUES
+('Aventura Amazônica', 'Amazonas', 7, 'Aventura', 2500.00, 'Passeios em trilhas e visita a comunidades indígenas.'),
+('Romance em Gramado', 'Gramado - RS', 5, 'Romântico', 3200.00, 'Pacote especial para casais com fondue e city tour.'),
+('Cultura em Ouro Preto', 'Ouro Preto - MG', 3, 'Cultural', 1500.00, 'Visitas guiadas aos museus e igrejas históricas.'),
+('Sol e Praia em Fortaleza', 'Fortaleza - CE', 6, 'Praia', 2800.00, 'Pacote com hotel à beira-mar e passeios de buggy.'),
+('Natureza em Bonito', 'Bonito - MS', 5, 'Ecoturismo', 2900.00, 'Flutuação nos rios cristalinos e visita às grutas.');
+
+
+-- Seleciona o banco de dados (se você não o fez no passo anterior ou abriu uma nova sessão)
+USE agencia_viagens;
+
+-- Insere o Serviço 1: Seguro Viagem Completo
+INSERT INTO servicos_adicionais (nome, descricao, preco) VALUES
+('Seguro Viagem Completo', 'Cobertura médica, odontológica, bagagem e cancelamento de viagem.', 250.00);
+
+-- Insere o Serviço 2: Translado Aeroporto-Hotel (Ida e Volta)
+INSERT INTO servicos_adicionais (nome, descricao, preco) VALUES
+('Translado Aeroporto-Hotel', 'Transporte privativo ida e volta do aeroporto para o hotel.', 120.00);
+
+-- Insere o Serviço 3: Passeio Guiado pela Cidade
+INSERT INTO servicos_adicionais (nome, descricao, preco) VALUES
+('Passeio Guiado pela Cidade', 'Tour guiado pelos principais pontos turísticos com acompanhamento bilíngue.', 80.50);
+
+USE agencia_viagens; -- Certifique-se de estar usando o banco de dados correto
